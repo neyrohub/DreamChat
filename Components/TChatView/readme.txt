@@ -1,3 +1,6 @@
+TChatView is update of TRichView ver 0.5.2
+Bajenov Andrey 2006-2008
+----------------------------------------------------------------
               TRichView, TRVStyle and TRVPrint Components
                (for Delphi 2-6 and C++ Builder 1,3-5)
                       ver 0.5.2 FREEWARE
