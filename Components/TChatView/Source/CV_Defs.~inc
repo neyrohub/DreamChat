@@ -1,0 +1,13 @@
+       { Determine Delphi/C++Builder version }
+
+//{$DEFINE ChatViewInstall}
+{$IFNDEF VER125}            {       not C++Builder 4.0       }
+  {$DEFINE ChatViewDEF5}    (* Delphi 5.0+                  *)
+{$ENDIF}
+{$IFNDEF VER135}       {       not C++Builder 5.0       }
+  {$DEFINE ChatViewDEF6}(* Delphi 6.0+                 *)
+{$ENDIF}
+{$IFNDEF VER150}
+   {$DEFINE ChatViewDEF7}(* Delphi 7.0+                 *)
+{$ENDIF}
+

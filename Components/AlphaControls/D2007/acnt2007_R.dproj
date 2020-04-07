@@ -1,0 +1,195 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{ae7a9713-0db9-467f-81c2-9a44491b45ed}</ProjectGuid>
+    <MainSource>acnt2007_R.dpk</MainSource>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+    <DCC_DependencyCheckOutputName>C:\Documents and Settings\All Users\Документы\RAD Studio\5.0\Bpl\acnt2007_R.bpl</DCC_DependencyCheckOutputName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_AssertionsAtRuntime>False</DCC_AssertionsAtRuntime>
+    <DCC_DebugInformation>False</DCC_DebugInformation>
+    <DCC_WriteableConstants>True</DCC_WriteableConstants>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_PentiumSafeDivide>True</DCC_PentiumSafeDivide>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_Define>RELEASE</DCC_Define>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <Version>7.0</Version>
+    <DCC_AssertionsAtRuntime>False</DCC_AssertionsAtRuntime>
+    <DCC_DebugInformation>False</DCC_DebugInformation>
+    <DCC_WriteableConstants>True</DCC_WriteableConstants>
+    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+    <DCC_PentiumSafeDivide>True</DCC_PentiumSafeDivide>
+    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+    <DCC_Define>DEBUG</DCC_Define>
+  </PropertyGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Delphi.Personality</Borland.Personality>
+    <Borland.ProjectType>Package</Borland.ProjectType>
+    <BorlandProject>
+<BorlandProject xmlns=""> <Delphi.Personality>   <Parameters>
+      <Parameters Name="UseLauncher">False</Parameters>
+      <Parameters Name="LoadAllSymbols">True</Parameters>
+      <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+    </Parameters>
+    <Package_Options>
+      <Package_Options Name="PackageDescription">AlphaControls run-time library</Package_Options>
+      <Package_Options Name="ImplicitBuild">False</Package_Options>
+      <Package_Options Name="DesigntimeOnly">False</Package_Options>
+      <Package_Options Name="RuntimeOnly">True</Package_Options>
+    </Package_Options>
+    <VersionInfo>
+      <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+      <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+      <VersionInfo Name="MajorVer">1</VersionInfo>
+      <VersionInfo Name="MinorVer">0</VersionInfo>
+      <VersionInfo Name="Release">0</VersionInfo>
+      <VersionInfo Name="Build">0</VersionInfo>
+      <VersionInfo Name="Debug">False</VersionInfo>
+      <VersionInfo Name="PreRelease">False</VersionInfo>
+      <VersionInfo Name="Special">False</VersionInfo>
+      <VersionInfo Name="Private">False</VersionInfo>
+      <VersionInfo Name="DLL">False</VersionInfo>
+      <VersionInfo Name="Locale">1049</VersionInfo>
+      <VersionInfo Name="CodePage">1251</VersionInfo>
+    </VersionInfo>
+    <VersionInfoKeys>
+      <VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
+      <VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
+      <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+      <VersionInfoKeys Name="InternalName"></VersionInfoKeys>
+      <VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
+      <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
+      <VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
+      <VersionInfoKeys Name="ProductName"></VersionInfoKeys>
+      <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+      <VersionInfoKeys Name="Comments"></VersionInfoKeys>
+    </VersionInfoKeys>
+    <Excluded_Packages>
+      
+      
+      
+      
+      <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+      <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+    </Excluded_Packages>
+    <Source>
+      <Source Name="MainSource">acnt2007_R.dpk</Source>
+    </Source>
+  </Delphi.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <ItemGroup />
+  <ItemGroup>
+    <DelphiCompile Include="acnt2007_R.dpk">
+      <MainSource>MainSource</MainSource>
+    </DelphiCompile>
+    <DCCReference Include="acAlphaHints.pas" />
+    <DCCReference Include="acAlphaImageList.pas" />
+    <DCCReference Include="acCoolBar.pas" />
+    <DCCReference Include="acDials.pas" />
+    <DCCReference Include="acGlow.pas" />
+    <DCCReference Include="acHeaderControl.pas" />
+    <DCCReference Include="acMagn.pas">
+      <Form>acMagnForm</Form>
+    </DCCReference>
+    <DCCReference Include="acNotebook.pas" />
+    <DCCReference Include="acntUtils.pas" />
+    <DCCReference Include="acPathDialog.pas">
+      <Form>PathDialogForm</Form>
+    </DCCReference>
+    <DCCReference Include="acPNG.pas" />
+    <DCCReference Include="acProgressBar.pas" />
+    <DCCReference Include="acSBUtils.pas" />
+    <DCCReference Include="acShellCtrls.pas" />
+    <DCCReference Include="acSkinPack.pas" />
+    <DCCReference Include="acThdTimer.pas" />
+    <DCCReference Include="acThumbForm.pas">
+      <Form>ThumbForm</Form>
+    </DCCReference>
+    <DCCReference Include="acZLibEx.pas" />
+    <DCCReference Include="sAlphaGraph.pas" />
+    <DCCReference Include="sBevel.pas" />
+    <DCCReference Include="sBitBtn.pas" />
+    <DCCReference Include="sBorders.pas" />
+    <DCCReference Include="sButton.pas" />
+    <DCCReference Include="sCalculator.pas" />
+    <DCCReference Include="sCalcUnit.pas">
+      <Form>sCalcForm</Form>
+    </DCCReference>
+    <DCCReference Include="sCheckbox.pas" />
+    <DCCReference Include="sCheckListBox.pas" />
+    <DCCReference Include="sColorDialog.pas">
+      <Form>sColorDialogForm</Form>
+    </DCCReference>
+    <DCCReference Include="sColorSelect.pas" />
+    <DCCReference Include="sComboBox.pas" />
+    <DCCReference Include="sComboBoxes.pas" />
+    <DCCReference Include="sComboEdit.pas" />
+    <DCCReference Include="sCommonData.pas" />
+    <DCCReference Include="sConst.pas" />
+    <DCCReference Include="sCurrEdit.pas" />
+    <DCCReference Include="sCurrencyEdit.pas" />
+    <DCCReference Include="sCustomComboEdit.pas" />
+    <DCCReference Include="sDateUtils.pas" />
+    <DCCReference Include="sDefaults.pas" />
+    <DCCReference Include="sDialogs.pas" />
+    <DCCReference Include="sEdit.pas" />
+    <DCCReference Include="sFade.pas" />
+    <DCCReference Include="sFileCtrl.pas" />
+    <DCCReference Include="sFontCtrls.pas" />
+    <DCCReference Include="sFrameAdapter.pas" />
+    <DCCReference Include="sFrameBar.pas" />
+    <DCCReference Include="sGauge.pas" />
+    <DCCReference Include="sGlyphUtils.pas" />
+    <DCCReference Include="sGradient.pas" />
+    <DCCReference Include="sGraphUtils.pas" />
+    <DCCReference Include="sGroupBox.pas" />
+    <DCCReference Include="sHintManager.pas" />
+    <DCCReference Include="sHtmlParse.pas" />
+    <DCCReference Include="sLabel.pas" />
+    <DCCReference Include="sListBox.pas" />
+    <DCCReference Include="sListView.pas" />
+    <DCCReference Include="sMaskData.pas" />
+    <DCCReference Include="sMaskEdit.pas" />
+    <DCCReference Include="sMDIForm.pas" />
+    <DCCReference Include="sMemo.pas" />
+    <DCCReference Include="sMessages.pas" />
+    <DCCReference Include="sMonthCalendar.pas" />
+    <DCCReference Include="sPageControl.pas" />
+    <DCCReference Include="sPanel.pas" />
+    <DCCReference Include="sPopupClndr.pas">
+      <Form>sPopupCalendar</Form>
+    </DCCReference>
+    <DCCReference Include="sRadioButton.pas" />
+    <DCCReference Include="sRichEdit.pas" />
+    <DCCReference Include="sScrollBar.pas" />
+    <DCCReference Include="sScrollBox.pas" />
+    <DCCReference Include="sSkinManager.pas" />
+    <DCCReference Include="sSkinMenus.pas" />
+    <DCCReference Include="sSkinProps.pas" />
+    <DCCReference Include="sSkinProvider.pas" />
+    <DCCReference Include="sSpeedButton.pas" />
+    <DCCReference Include="sSpinEdit.pas" />
+    <DCCReference Include="sSplitter.pas" />
+    <DCCReference Include="sStatusBar.pas" />
+    <DCCReference Include="sStoreUtils.pas" />
+    <DCCReference Include="sStrings.pas" />
+    <DCCReference Include="sStyleSimply.pas" />
+    <DCCReference Include="sTabControl.pas" />
+    <DCCReference Include="sThirdParty.pas" />
+    <DCCReference Include="sToolBar.pas" />
+    <DCCReference Include="sToolEdit.pas" />
+    <DCCReference Include="sTrackBar.pas" />
+    <DCCReference Include="sTreeView.pas" />
+    <DCCReference Include="sUpDown.pas" />
+    <DCCReference Include="sVclUtils.pas" />
+    <DCCReference Include="vcl.dcp" />
+    <DCCReference Include="vcljpg.dcp" />
+    <DCCReference Include="vclx.dcp" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
+</Project>
