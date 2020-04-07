@@ -1,0 +1,182 @@
+[Common]
+KeyboardLayout=00000409
+Name=Deutsch
+
+[ErrorStrings]
+10=Fehler
+11=zur Arbeitszeit
+12=Job fehlgeschlagen und gelöscht.
+
+[Strings]
+10=Öffentlicher Chat
+11=Privater Chat
+12=Verbindung
+13=Pinwand
+14=Pinnwand wurde aktualisiert
+15=User verbunden 
+16=User getrennt       
+17=user antwortet nicht 
+18=Privat mit  
+19=User hat sich umbenannt
+//[Form]
+20=Schließen
+21=Aktualisieren
+22=Speichere Debug-Log
+23=Private Nachricht gesendet
+24=Private Nachricht an Alle
+25=Erzeuge Verbindung
+26=Gänzliche ignorieren
+27=User Information
+28=Privatem Chat beitreten
+29=Gespräch beitreten
+//[UserInfo]
+30=Zeige Username:
+31=Username:
+32=IP:
+33=Computername:
+34=Anmeldung:
+35=Chat Version:
+36=CommDll Version:
+37=Status:
+//[NewLine]
+38=Passwort eingeben
+39=Beitreten
+40=Passwort und Verbindungsname eingeben
+41=Erzeugen
+42=Neue Verbindung
+43=Cancel
+44=Verbindungsname
+45=Passwort
+//[MainPopUpMenu]
+46=Verlassen
+47=Zeige Freigabe \\
+48=Schreibe UserName
+
+[ExceptDictWords]
+ExceptSymbols=,.[]
+
+[EngToLocale]
+http://www.=http://www.
+http:\\=http://
+http://=http://
+/nickname=/nickname
+/chat=/chat
+file://=file:\\
+file:\\=file:\\
+file=file
+/msg=/msg
+
+[LocaleToEng]
+http://www.=http://www.
+http:\\=http://
+http://=http://
+file://=file:\\
+file:\\=file:\\
+/nickname=/nickname
+/chat=/chat
+file=file
+/msg=/msg
+
+[Hints]
+ClearBtn=Clear message window
+RefreshBBtn=Refresh list of users
+Status0Btn=Go to "Normal" mode
+Status1Btn=Go to "Don't disturb on MASS messages" mode
+Status2Btn=Go to "Don't disturb on all messages" mode
+Status3Btn=Go to "I'm away" mode
+SmileBtn=Open smiles list...
+DebugBtn=Open debug window...
+SettingsBtn=Open settings dialog...
+AboutBtn=About...
+
+[Settings]
+dc=Dream Chat
+n=Nickname:
+nnm=NoNaMe
+NoAvailabS=There is no accessible skins.
+NoSkin=Without skin
+NoC=Can not create a folder 
+Nm=New message:
+Vm=Enter a message:
+M0=Hi to all!
+M1=Busy!
+M2=Do not disturb!
+M3=Went away!
+lUsers=User:
+Default=Default settings
+Path=Sound file:
+FSettings=Options
+bAcept=Apply
+bCancel=Cancel
+bOk=OK
+eMess=Message text
+lBoard=Message on message board
+lInfoName=Information, Title
+lInfoText=Information, Text
+lLink=Link
+lMeText=Report about itself
+lNormal=Received message
+lOnLink=Pressed link
+lPrivat=Private message
+lSystem=System message
+tUsers_Item0=Alex
+tUsers_Item1=New line
+lFonts=Fonts:
+gSkin=Skin:
+cbSkin_BoundLabel=Fonts:
+eSkinPath_BoundLabel=Folder with skins:
+lColor=Skin color:
+lLangSkin=Skin and Language:
+gbBoard=Message board:
+bbEdBoard=Edit
+feMesBoard_BoundLabel=File:
+gReceived=Confirmation of delivery:
+lMess=Messages:
+tcAutoM_Tabs0=Connect message:
+tcAutoM_Tabs1=Mode "Don't disturb on MASS messages":
+tcAutoM_Tabs2=Mode "Don't disturb on all messages":
+tcAutoM_Tabs3=Mode "I'm away":
+bbAdd=Add
+bbDel=Delete
+bbDown=Down
+bbEdit=Edit
+bbUp=Up
+PopupMenu1_Items0=Add
+PopupMenu1_Items1=Edit
+PopupMenu1_Items2=Delete
+gProtocols=Compatibility:
+cProto=Compatibility with the version of "Antikhak" 1.3b8
+gServer=Dedicated server:
+eIPAdr_BoundLabel=IP-address:
+ePortNamb_BoundLabel=Port:
+gSoedinenie=Connect using:
+rMailSlots=MailSlots
+rVidelServ=Dedicated server
+lPodkl=Connection:
+pNameSel=Nickname:
+rFromLogon=Name from Windows login
+rFromName=Computer name
+rName=Name from a list:
+gbUserFonts=Fonts:
+lNick=Nickname
+lMouseOver=Pressed nickname
+gbSounds=Sounds:
+fbSounds_Item0=Private message has been arrived
+fbSounds_Item1=Mass private message has been arrived
+fbSounds_Item2=Message board has been updated
+fbSounds_Item3=Message has been arrived
+fbSounds_Item4=User has connected
+fbSounds_Item5=User has disconnected
+fbSounds_Item6=User has renamed
+fbSounds_Item7=User has changed status
+fbSounds_Item8=Line has been created
+fbSounds_Item9=Line has been entered
+fbSounds_Item10=Message has been delivered
+fbSounds_Item11=REFRESH request has been arrived
+tPanelSel_Item0=Connection
+tPanelSel_Item1=Common
+tPanelSel_Item2=Fonts
+tPanelSel_Item3=Skin and Language
+tPanelSel_Item4=Messages
+tPanelSel_Item5=Users
+gbLanguage=Language:

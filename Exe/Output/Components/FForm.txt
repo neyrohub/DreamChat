@@ -1,0 +1,25 @@
+object FormMain: TFormMain
+  Left = 0
+  Top = 0
+  ActiveControl = Edit1
+  BorderIcons = [biSystemMenu, biMinimize]
+  Caption = 'Dream Chat 0.999'
+  ClientHeight = 450
+  ClientWidth = 732
+  Color = clBtnFace
+  Font.Charset = RUSSIAN_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -14
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poDesigned
+  OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnResize = FormResize
+  OnShow = FormShow
+  PixelsPerInch = 120
+  TextHeight = 17
+end

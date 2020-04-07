@@ -1,0 +1,8 @@
+object Panel2: TsPanel
+  Left = 533
+  Top = 0
+  Width = 33
+  Height = 324
+  Align = alRight
+  TabOrder = 1
+end

@@ -1,0 +1,146 @@
+program DreamChat;
+
+{$DEFINE DisableDublicateRun} //запрещает запускать 2ю копию чата
+// сейчас нету смысла разрешать запускать вторую копию т.к. копии будут конфликтовать по лог файлам
+// и вторая копия упадет на инициализации логов
+
+uses
+  ExceptionLog,
+  SysUtils,
+  ComObj,
+  Forms,
+  Windows,
+  Dialogs,
+  Inifiles,
+{$IFDEF USELOG4D} log4d, {$ENDIF USELOG4D}
+  uFormMain in 'uFormMain.pas' {FormMain},
+  uFormDebug in 'uFormDebug.pas' {FormDebug},
+  uFormStart in 'uFormStart.pas' {FormStart},
+  uFormPassword in 'uFormPassword.pas' {FormPassword},
+  uFormUserInfo in 'uFormUserInfo.pas' {FormUI},
+  DreamChatMessageBox in '..\Common\DreamChatMessageBox.pas',
+  USettings in 'USettings.pas' {FSettings},
+  USoundFrame in 'USoundFrame.pas' {SoundFrame: TFrame},
+  DreamChatConsts in '..\Common\DreamChatConsts.pas',
+  UChatUser in 'UChatUser.pas',
+  uBMPtoICO in 'uBMPtoICO.pas',
+  UVTHeaderPopupMenu in 'UVTHeaderPopupMenu.pas',
+  uChatLine in 'uChatLine.pas',
+  uCommLine in 'uCommLine.pas',
+  DreamChatTools in '..\Common\DreamChatTools.pas',
+  DreamChatConfig in '..\Common\DreamChatConfig.pas',
+  DreamChatProtocolMessage in '..\Common\DreamChatProtocolMessage.pas',
+  UGifVirtualStringTree in 'UGifVirtualStringTree.pas',
+  DreamChatTranslater in 'DreamChatTranslater.pas',
+  PathBuilder in 'PathBuilder.pas',
+  uFormAbout in 'uFormAbout.pas',
+  uFormPopUpMessage in 'uFormPopUpMessage.pas' {FormPopUpMessage},
+  ChatView in '..\Components\ChatView\ChatView.pas',
+//<<<<<<< DreamChat.dpr
+//  uMouseHook in 'uMouseHook.pas';
+//=======
+  ImageLoader in 'ImageLoader.pas',
+  uFormSmiles in 'uFormSmiles.pas' {FormSmiles};
+//>>>>>>> 1.34
+
+{$R *.RES}
+
+var
+  command: string;
+  i: integer;
+  info: TStartUpInfo;
+
+{$IFDEF DisableDublicateRun}
+
+{$ELSE}
+  randomGUID: TGUID;
+  randomString: string;
+
+{$IFDEF USELOG4D}
+  logger: TlogLogger;
+{$ENDIF USELOG4D}
+
+{$ENDIF DisableDublicateRun}
+
+//  RegisterProc: Pointer;
+//  CommunicationLibHandle: HMODULE;
+//  TempChatConfig: TMemIniFile;
+//  s: string;
+
+begin
+  IsMultiThread := True;
+  //uFormMain.ExePath := ExtractFilePath(Application.ExeName);
+  //ExceptionLog.CurrentEurekaLogOptions.OutputPath:=uFormMain.ExePath;
+
+//короче трабла вот в чем: если мы запускаем чат под другим логином,
+//то он не может открыть файл в памяти (ERROR_ACCESS_DENIED)
+//решение - добавлять в название меморифайла имя логина юзера.
+
+{$IFDEF DisableDublicateRun}
+//С этим ключом юзер не сможет запустить 2ю копию чата!
+// Имя мемори файла содержит имя юзера
+  CommandLine := TCommandLine.Create('CommandLine_' + GetUserLoginName());
+{$ELSE}
+  //Если ключ не установлен, то юзер сможет запустить 2ю копию чата!
+
+{$IFDEF USELOG4D}
+  TLogPropertyConfigurator.Configure(TPathBuilder.GetExePath() +'DreamChat.props');
+  logger := TLogLogger.GetLogger(DREAMCHATLOGGER_NAME);
+  logger.Info('-------- DreamChat Started -------');
+{$ENDIF USELOG4D}
+
+  try
+    OleCheck(CreateGUID(randomGUID));
+    //решение - добавлять в название меморифайла случайную строку (GUID).
+    randomString := GUIDToString(randomGUID);
+  except
+    on E: EOleSysError do
+    begin
+{$IFDEF USELOG4D}
+      logger := TLogLogger.GetLogger(DREAMCHATLOGGER_NAME);
+      logger.Error('[Main]', E);
+{$ENDIF USELOG4D}
+      TDreamChatMessageBox.Show(E.Message);
+    end;
+  end;
+
+  CommandLine := TCommandLine.Create('CommandLine_' + IntToStr(GetTickCount()));
+//  CommandLine := TCommandLine.Create('CommandLine_' + randomString);
+{$ENDIF}
+
+command := '';
+i := pos('/', CmdLine);
+if (i <> length(CmdLine)) and (i > 0) then begin
+  //inc(i);inc(i);
+  command := copy(CmdLine, i, Length(CmdLine) - i + 1);
+  //MessageBox(0, PChar(command), PChar('') ,mb_ok);
+  end;
+
+if (CommandLine.FirstCopyApplication = false) then begin
+  //запущена вторая копия
+  if (ParamCount > 0)
+    then CommandLine.Command := command;
+
+  //Form1.Caption := 'Message was send!';
+  end
+else
+  begin
+  //запущена первая копия
+  GetStartUpInfo(Info);
+  Info.wShowWindow := SW_HIDE;
+  ShowWindow(Application.Handle, Info.wShowWindow);
+
+  Application.Initialize;
+  Application.CreateForm(TFormMain, FormMain);
+  Application.CreateForm(TFormUI, FormUI);
+  Application.Title := CAPTIONVERSION;
+  Application.Run;
+  end;
+
+FreeAndNil(CommandLine);
+
+{$IFDEF USELOG4D}
+  logger.Info('-------- DreamChart Exiting -------');
+{$ENDIF USELOG4D}
+
+end.

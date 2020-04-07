@@ -1,0 +1,4 @@
+object TabSheet2: TsTabSheet
+  Caption = 'Доска объявлений'
+  ImageIndex = 1
+end

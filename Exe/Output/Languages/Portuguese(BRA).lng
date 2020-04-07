@@ -1,0 +1,182 @@
+[Common]
+KeyboardLayout=00000416
+Name=Português(BRA)
+
+[ErrorStrings]
+10=Erro
+11=Hora de trabalhar
+12=Trabalho falhou e foi deletado.
+
+[Strings]
+10=Common chat
+11=Chat Privado
+12=Sala
+13=Quadro de mensagens
+14=Quadro de mensagens foi atualizado
+15=Usuário conectado
+16=Usuário desconectado
+17=Usuário não responde
+18=Privado com
+19=Usuário foi renomeado
+//[Form]
+20=Fechar
+21=Atualizar
+22=Salvar log de debug
+23=Mensagem Privada
+24=Mensagem Privada para todos
+25=Criar Sala
+26=Ignorar totalmente
+27=Informções do usuário
+28=Entrar no chat privado
+29=entrar na Sala
+//[UserInfo]
+30=Exibir Apelido:
+31=Apelido:
+32=IP:
+33=Nome do computador:
+34=Login:
+35=Versão do chat:
+36=CommDll version:
+37=Estado:
+//[NewLine]
+38=Inserir Password
+39=Entrar
+40=Ensira o Password e o nome da sala
+41=Criar
+42=Nova sala
+43=Cancelar
+44=Nome da sala
+45=Password
+//[MainPopUpMenu]
+46=Sair
+47=Ver compartilhamento \\
+48=Escrever apelido
+
+[Hints]
+ClearBtn=Clear message window
+RefreshBBtn=Refresh list of users
+Status0Btn=Go to "Normal" mode
+Status1Btn=Go to "Don't disturb on MASS messages" mode
+Status2Btn=Go to "Don't disturb on all messages" mode
+Status3Btn=Go to "I'm away" mode
+SmileBtn=Open smiles list...
+DebugBtn=Open debug window...
+SettingsBtn=Open settings dialog...
+AboutBtn=About...
+
+[Settings]
+dc=Dream Chat
+n=Nickname:
+nnm=Sem Nome
+NoAvailabS=Não é uma skin acessível.
+NoSkin=Sem skin
+NoC=Não pode Criar o Arquivo 
+Nm=Nova mensagem:
+Vm=Insira a mensagem:
+M0=Olá para todosl!
+M1=Oculpado!
+M2=Não pertube!
+M3=Afastado!
+lUsers=User:
+Default=Default settings
+Path=Sound file:
+FSettings=Opções
+bAcept=Aplicar
+bCancel=Cancelar
+bOk=OK
+eMess=mensagem de texto
+lBoard=Mensagem no quadro de mensagem
+lInfoName=Information, Title
+lInfoText=Information, Text
+lLink=Link
+lMeText=Report about itself
+lNormal=Mensagem recebida
+lOnLink=Pressed link
+lPrivat=Mensagem Privada
+lSystem=Mensagem de Systema
+tUsers_Item0=Alex
+tUsers_Item1=Nova Sala
+lFonts=Fontes:
+gSkin=Skin:
+cbSkin_BoundLabel=Fontes:
+eSkinPath_BoundLabel=Arquivo com a skin:
+lColor=Cor da Skin:
+lLangSkin=Linguagem e Skin:
+gbBoard=Quadro de Mensagem:
+bbEdBoard=Editar
+feMesBoard_BoundLabel=Arquivo:
+gReceived=Confirmação de entrega:
+lMess=Mensages:
+tcAutoM_Tabs0=Mensagem ao conectar:
+tcAutoM_Tabs1=Modo "Não pertube em mesagem em MASSA":
+tcAutoM_Tabs2=Modo "Não pertube em todas as mensagens":
+tcAutoM_Tabs3=Modo "Estou fora":
+bbAdd=Adicionar
+bbDel=Deletar
+bbDown=descer
+bbEdit=Editar
+bbUp=Subir
+PopupMenu1_Items0=Adicionar
+PopupMenu1_Items1=Editar
+PopupMenu1_Items2=Deletar
+gProtocols=Compatibilidade:
+cProto=Compatibilidade com a versão de "Antikhak" 1.3b8
+gServer=Servidor dedicado:
+eIPAdr_BoundLabel=IP-address:
+ePortNamb_BoundLabel=Porta:
+gSoedinenie=Conectar usando:
+rMailSlots=MailSlots
+rVidelServ=Servidor dedicado
+lPodkl=Conecção:
+pNameSel=Nickname:
+rFromLogon=nome de login do Windows
+rFromName=Nome do computador
+rName=Nome de uma lista:
+gbUserFonts=Fonts:
+lNick=Nickname
+lMouseOver=Pressed nickname
+gbSounds=Sounds:
+fbSounds_Item0=Private message has been arrived
+fbSounds_Item1=Mass private message has been arrived
+fbSounds_Item2=Message board has been updated
+fbSounds_Item3=Message has been arrived
+fbSounds_Item4=User has connected
+fbSounds_Item5=User has disconnected
+fbSounds_Item6=User has renamed
+fbSounds_Item7=User has changed status
+fbSounds_Item8=Line has been created
+fbSounds_Item9=Line has been entered
+fbSounds_Item10=Message has been delivered
+fbSounds_Item11=REFRESH request has been arrived
+tPanelSel_Item0=Conecção
+tPanelSel_Item1=Common
+tPanelSel_Item2=Fontes
+tPanelSel_Item3=Linguagem e Skin
+tPanelSel_Item4=Mensagens
+tPanelSel_Item5=Users
+gbLanguage=Linguagem:
+
+[ExceptDictWords]
+ExceptSymbols=,.[]
+
+[EngToLocale]
+http://www.=http://www.
+http:\\=http://
+http://=http://
+/nickname=/nickname
+/chat=/chat
+file://=file:\\
+file:\\=file:\\
+file=file
+/msg=/msg
+
+[LocaleToEng]
+http://www.=http://www.
+http:\\=http://
+http://=http://
+file://=file:\\
+file:\\=file:\\
+/nickname=/nickname
+/chat=/chat
+file=file
+/msg=/msg

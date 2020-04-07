@@ -1,0 +1,14 @@
+object Edit1: TsEdit
+  Left = 2
+  Top = 2
+  Width = 22
+  Height = 21
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Name = 'MS Reference Sans Serif'
+  Font.Size = 10
+  Font.Style = []
+  ParentFont = False
+  TabOrder = 0
+  Text = ''
+end

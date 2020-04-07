@@ -1,0 +1,7 @@
+object SpeedButton7: TsSpeedButton
+  Left = 3
+  Top = 164
+  Width = 26
+  Height = 26
+  Flat = True
+end

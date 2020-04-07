@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2013.10.13 01:59:12.531.pas,C:\Program Files\CodeGear\RAD Studio\5.0\Projects\DreamChat\Communication\TCPKrnl\12\ProtocolMessage.pas=C:\Program Files\CodeGear\RAD Studio\5.0\Projects\DreamChat\Communication\TCPKrnl\12\uProtocolMessage.pas</Transaction>
+    <Transaction>2013.10.13 02:03:42.421.pas,C:\Program Files\CodeGear\RAD Studio\5.0\Projects\DreamChat\Communication\TCPKrnl\12\uKeysObj.pas=C:\Program Files\CodeGear\RAD Studio\5.0\Projects\DreamChat\Communication\TCPKrnl\12\uCommonUnitObj.pas</Transaction>
+    <Transaction>2013.11.07 14:02:44.461.dproj,C:\Program Files\CodeGear\RAD Studio\5.0\Projects\DreamChat\Communication\tcpkrnl\12\tcpkrnl.dproj=C:\Program Files\CodeGear\RAD Studio\5.0\Projects\DreamChat\Communication\tcpkrnl\13\tcpkrnl.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

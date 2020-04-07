@@ -1,0 +1,17 @@
+//Проблема в том, что к объектам и переменным объявленным в *.dpr нельзя 
+//получить доступ из подключаемых модулей *.pas
+//поэтому нужно делать общий модуль с такими переменными
+unit uKeysObj;
+
+interface
+
+uses  Classes;
+
+var
+  CryptoKeyForRemoteComputers                                    :TStringList;
+
+implementation
+
+end.
+
+

@@ -1,0 +1,606 @@
+unit DreamChatConfig;
+
+interface
+
+uses Classes;
+
+type
+
+TDreamChatDefaults = class
+public
+  // general
+  const ConfigIniFileName = 'config.ini';
+  const JobsIniFileName = 'Jobs.ini';
+  const SmilesIniFileName = 'smiles.ini';
+  const DefaultSkinsDir = 'Skins\';
+  const DefaultUserIniFileName = 'DefaultUser.ini';
+  const CommunicationLibFileNameMailslot = 'mskrnl.dll';
+  const CommunicationLibFileNameTCP = 'tcpkrnl.dll';
+  const DefaultHiAll = 'Hi all!';
+  const ComponentsFolderName = 'Components\';
+  const ImagesFolderName = 'Images\';
+  const SmilesFolderName = 'Smiles\';
+  const UsersFolderName = 'Users\';
+  const LanguagesFolderName = 'Languages\';
+  const MainChatLineName = 'iTCniaM';
+  const SmilesSmiles = 'Smiles'; // name of section in smiles.ini
+  const SmilesOptions = 'Options'; // name of section in smiles.ini
+end;
+
+TDreamChatConfig = class
+private
+  // config.ini sections
+  const Common         = 'Common';
+  const MessagesState  = 'MessagesState';
+  const MessagesState0 = 'MessagesState0';
+  const MessagesState1 = 'MessagesState1';
+  const MessagesState2 = 'MessagesState2';
+  const MessagesState3 = 'MessagesState3';
+  const Jobs           = 'Jobs';
+  const Protocols      = 'Protocols';
+  const Crypto         = 'Crypto';
+  const ConnectionType = 'ConnectionType';
+  const SystemMessages = 'SystemMessages';
+  const HotKeys        = 'HotKeys';
+  const LinksKeyWords  = 'LinksKeyWords';
+  const Skin           = 'Skin';
+
+  // smiles.ini section
+  const Smiles         = 'Smiles';
+
+  // parameters
+  //section [Common]
+  const NickName               = 'NickName';
+  const MessageBoard           = 'MessageBoard';
+  const ReceivedMessage        = 'ReceivedMessage';
+  const IgnoredMessage         = 'IgnoredMessage';
+  const MaxSizeOfMessBoardPart = 'MaxSizeOfMessBoardPart';
+  const AutoRefreshTime        = 'AutoRefreshTime';
+  const MessageBoardRefreshTime = 'MessageBoardRefreshTime';
+  const DividedMessageBoardRefreshTime = 'DividedMessageBoardRefreshTime';
+  const Language               = 'Language';
+  const PrevNicksCount         = 'PrevNicksCount';
+  //const PrevNick1              = 'PrevNick1';
+  //const PrevNick2              = 'PrevNick2';
+  const PrevNick              = 'PrevNick';
+  const TimeOutAWay            = 'TimeOutAWay';
+  const TimeOutNA              = 'TimeOutNA';
+  const MinimizeOnClose        = 'MinimizeOnClose';
+
+  //section [Jobs]
+  const CommandAndTimeDelimiter = 'CommandAndTimeDelimiter';
+  const JobSeekingTimer        = 'JobSeekingTimer';
+  const RunIfJobError          = 'RunIfJobError';
+
+  //section [Protocols]
+  const ProtoName              = 'ProtoName';
+
+  //section [Crypto]
+  const Key                    = 'Key';
+
+  //section [ConnectionType]
+  const Server                 = 'Server';
+  const IP                     = 'IP';
+  const Port                   = 'Port';
+  const LocalIP                = 'LocalIP';
+
+  //section [SystemMessages]
+  const RefreshMessage         = 'RefreshMessage';
+  const TryingMessage          = 'TryingMessage';
+  const ConnectedMessage       = 'ConnectedMessage';
+  const SoundDebug             = 'SoundDebug';
+
+  //section [HotKeys]
+  const AppBringToFront        = 'AppBringToFront';
+
+  //section [Skin]
+  const Enable                 = 'Enable';
+  const SkinName               = 'SkinName';
+  const SkinColor              = 'SkinColor';
+  const SkinsPath              = 'SkinsPath';
+
+  class procedure Load;
+public
+  //constructor Create;
+  //destructor Destroy;
+  class procedure GetStrings(list: TStrings);
+  class procedure SetStrings(list: TStrings);
+
+  class function GetNickName: string;
+  class function GetMessageBoard: string;
+  class function GetReceivedMessage: string;
+  class function GetIgnoredMessage: string;
+  class function GetMaxSizeOfMessBoardPart: integer;
+  class function GetAutoRefreshTime: integer;
+  class function GetMessageBoardRefreshTime: integer;
+  class function GetDividedMessageBoardRefreshTime: integer;
+  class function GetLanguageFileName: string;
+  class function GetPrevNicksCount: integer;
+//  class function GetPrevNick1: string;
+//  class function GetPrevNick2: string;
+  class function GetPrevNick(index: integer): string;
+  class function GetTimeOutAWay: integer;
+  class function GetTimeOutNA: integer;
+  class function GetMinimizeOnClose: boolean;
+
+  class function GetCommandAndTimeDelimiter: string;
+  class function GetJobSeekingTimer: integer;
+  class function GetRunIfJobError: string;
+
+  class function GetProtoName: string;
+  class function GetCryptoKey: string;
+  class function GetServer: string;
+  class function GetIP: string;
+  class function GetPort: integer;
+  class function GetLocalIP: string;
+  class function GetRefreshMessage: boolean;
+  class function GetTryingMessage: boolean;
+  class function GetConnectedMessage: boolean;
+  class function GetSoundDebug: boolean;
+  class function GetAppBringToFront: string;
+  class function GetEnable: boolean;
+  class function GetSkinName: string;
+  class function GetSkinColor: integer;
+  class function GetSkinsPath: string;
+//dchat 1.0
+//dchat 1.0
+
+  class procedure FillMessagesState(list: TStrings);
+  class procedure FillMessagesState0(list: TStrings);
+  class procedure FillMessagesState1(list: TStrings);
+  class procedure FillMessagesState2(list: TStrings);
+  class procedure FillMessagesState3(list: TStrings);
+  class procedure FillLinksKeywords(list: TStrings);
+
+  // setters
+  class procedure SetMinimizeOnClose(value: boolean);
+  class procedure SetSkinsPath(value: string);
+  class procedure SetEnable(value: boolean);
+  class procedure SetSkinName(value: string);
+  class procedure SetSkinColor(value: integer);
+  class procedure SetNickName(value: string);
+  class procedure SetLanguageFileName(value: string);
+  class procedure SetProtoName(value: string);
+  class procedure SetServer(value: string);
+  class procedure SetIP(value: string);
+  class procedure SetPort(value: integer);
+  class procedure SetPrevNicksCount(value: integer);
+  class procedure SetMessageBoard(value: string);
+  class procedure SetPrevNick(index: integer; value: string);
+  class procedure SetReceivedMessage(value: string);
+  class procedure SetAppBringToFront(value: string);
+  class procedure SetCryptoKey(value: string);
+
+  class procedure DeletePrevNick(index: integer);
+end;
+
+implementation
+
+uses SysUtils, IniFiles, uPathBuilder, DreamChatTools;
+
+var
+  FChatConfig: TMemIniFile = nil;
+
+
+{ TDreamChatConfig }
+
+class procedure TDreamChatConfig.DeletePrevNick(index: integer);
+begin
+  Load();
+  FChatConfig.DeleteKey(Common, PrevNick + IntToStr(index));
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.FillLinksKeywords(list: TStrings);
+begin
+  Load();
+  FChatConfig.ReadSectionValues(LinksKeyWords, list);
+end;
+
+class procedure TDreamChatConfig.FillMessagesState(list: TStrings);
+var
+  i: integer;
+  StrList: TStrings;
+begin
+  Load();
+
+  StrList := TStringList.Create;
+  try
+    for i := 0 to 3 do begin
+      FChatConfig.ReadSectionValues(MessagesState + IntToStr(i), StrList);
+      if StrList.Count > 0 then
+        begin
+          list.Add(StrList.Strings[0]);
+        end
+        else
+        begin
+          list.Add(TDreamChatDefaults.DefaultHiAll);
+        end;
+      end;
+  finally
+    StrList.Free;
+  end;
+end;
+
+class procedure TDreamChatConfig.FillMessagesState0(list: TStrings);
+begin
+  Load();
+  FChatConfig.ReadSectionValues(MessagesState0, list);
+  if list.Count = 0 then
+    list.Add(TDreamChatDefaults.DefaultHiAll);
+end;
+
+class procedure TDreamChatConfig.FillMessagesState1(list: TStrings);
+begin
+  Load();
+  FChatConfig.ReadSectionValues(MessagesState1, list);
+end;
+
+class procedure TDreamChatConfig.FillMessagesState2(list: TStrings);
+begin
+  Load();
+  FChatConfig.ReadSectionValues(MessagesState2, list);
+end;
+
+class procedure TDreamChatConfig.FillMessagesState3(list: TStrings);
+begin
+  Load();
+  FChatConfig.ReadSectionValues(MessagesState3, list);
+end;
+
+class function TDreamChatConfig.GetAppBringToFront: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(HotKeys, AppBringToFront, '');
+end;
+
+class function TDreamChatConfig.GetAutoRefreshTime: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Common, AutoRefreshTime, 180*1000); //180 sec
+end;
+
+class function TDreamChatConfig.GetCommandAndTimeDelimiter: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Jobs, CommandAndTimeDelimiter, ' ');
+end;
+
+class function TDreamChatConfig.GetConnectedMessage: boolean;
+begin
+  Load();
+  Result := FChatConfig.ReadBool(SystemMessages, ConnectedMessage, True);
+end;
+
+class function TDreamChatConfig.GetDividedMessageBoardRefreshTime: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Common, DividedMessageBoardRefreshTime, 1000);
+end;
+
+class function TDreamChatConfig.GetEnable: boolean;
+begin
+  Load();
+  Result := FChatConfig.ReadBool(Skin, Enable, False);
+end;
+
+class function TDreamChatConfig.GetIgnoredMessage: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, IgnoredMessage, 'Your''s message was ignored'); //TODO: перевод???
+end;
+
+class function TDreamChatConfig.GetIP: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(ConnectionType, IP, '127.0.0.1');
+end;
+
+class function TDreamChatConfig.GetJobSeekingTimer: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Jobs, JobSeekingTimer, 60000);
+end;
+
+class function TDreamChatConfig.GetCryptoKey: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Crypto, Key, 'tahci');
+end;
+
+class function TDreamChatConfig.GetLanguageFileName: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, Language, 'Languages\English.lng');
+end;
+
+class function TDreamChatConfig.GetLocalIP: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(ConnectionType, LocalIP, '127.0.0.1');
+end;
+
+class function TDreamChatConfig.GetMaxSizeOfMessBoardPart: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Common, MaxSizeOfMessBoardPart, 10);
+end;
+
+class function TDreamChatConfig.GetMessageBoard: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, MessageBoard, 'MessageBoard.txt');
+end;
+
+class function TDreamChatConfig.GetMessageBoardRefreshTime: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Common, MessageBoardRefreshTime, 50);
+end;
+
+class function TDreamChatConfig.GetMinimizeOnClose: boolean;
+begin
+  Load();
+  Result := FChatConfig.ReadBool(Common, MinimizeOnClose, False);
+end;
+
+class function TDreamChatConfig.GetNickName: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, NickName, 'NoNaMe'); // TODO: perhaps NoName needs to be translated via translater
+end;
+
+class function TDreamChatConfig.GetPort: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(ConnectionType, Port, 6666);
+end;
+
+{class function TDreamChatConfig.GetPrevNick1: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, PrevNick1, '');
+end;
+
+class function TDreamChatConfig.GetPrevNick2: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, PrevNick2, '');
+end;
+}
+class function TDreamChatConfig.GetPrevNick(index: integer): string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, PrevNick + IntToStr(index), '');
+end;
+
+class function TDreamChatConfig.GetPrevNicksCount: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Common, PrevNicksCount, 0);
+end;
+
+class function TDreamChatConfig.GetProtoName: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Protocols, ProtoName, 'iChat');
+end;
+
+class function TDreamChatConfig.GetReceivedMessage: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Common, ReceivedMessage, '<EMPTY RECEIVED MESSAGE>');
+end;
+
+class function TDreamChatConfig.GetRefreshMessage: boolean;
+begin
+  Load();
+  Result := FChatConfig.ReadBool(SystemMessages, RefreshMessage, True);
+end;
+
+class function TDreamChatConfig.GetRunIfJobError: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Jobs, RunIfJobError, '');
+end;
+
+class function TDreamChatConfig.GetServer: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(ConnectionType, Server, 'Yes');
+end;
+
+class function TDreamChatConfig.GetSkinColor: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Skin, SkinColor, 0);
+end;
+
+class function TDreamChatConfig.GetSkinName: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Skin, SkinName, '');
+end;
+
+class function TDreamChatConfig.GetSkinsPath: string;
+begin
+  Load();
+  Result := FChatConfig.ReadString(Skin, SkinsPath, TPathBuilder.GetDefaultSkinsDirFull);
+end;
+
+class function TDreamChatConfig.GetSoundDebug: boolean;
+begin
+  Load();
+  Result := FChatConfig.ReadBool(SystemMessages, SoundDebug, False);
+end;
+
+class procedure TDreamChatConfig.GetStrings(list: TStrings);
+begin
+  Load();
+  FChatConfig.GetStrings(list);
+end;
+
+class function TDreamChatConfig.GetTimeOutAWay: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Common, TimeOutAWay, 600);
+end;
+
+class function TDreamChatConfig.GetTimeOutNA: integer;
+begin
+  Load();
+  Result := FChatConfig.ReadInteger(Common, TimeOutNA, 1200);
+end;
+
+class function TDreamChatConfig.GetTryingMessage: boolean;
+begin
+  Load();
+  Result := FChatConfig.ReadBool(SystemMessages, TryingMessage, True);
+end;
+
+//dchat 1.0
+//dchat 1.0
+
+class procedure TDreamChatConfig.Load;
+begin
+  if FChatConfig = nil
+    then FChatConfig := TMemIniFile.Create(TPathBuilder.GetConfigIniFileName());
+end;
+
+class procedure TDreamChatConfig.SetEnable(value: boolean);
+begin
+  Load();
+  FChatConfig.WriteBool(Skin, Enable, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetIP(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(ConnectionType, IP, CheckIP(value));
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetLanguageFileName(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Common, Language, TDreamChatDefaults.LanguagesFolderName + ExtractFileName(value));
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetMessageBoard(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Common, MessageBoard, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetMinimizeOnClose(value: boolean);
+begin
+  Load();
+  FChatConfig.WriteBool(Common, MinimizeOnClose, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetNickName(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Common, NickName, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetPort(value: integer);
+begin
+  Load();
+  FChatConfig.WriteInteger(ConnectionType, Port, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetPrevNick(index: integer; value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Common, PrevNick + IntToStr(index), value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetPrevNicksCount(value: integer);
+begin
+  Load();
+  FChatConfig.WriteInteger(Common, PrevNicksCount, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetProtoName(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Protocols, ProtoName, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetReceivedMessage(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Common, ReceivedMessage, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetSkinName(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Skin, SkinName, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetServer(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(ConnectionType, Server, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetSkinColor(value: integer);
+begin
+  Load();
+  FChatConfig.WriteInteger(Skin, SkinColor, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetSkinsPath(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Skin, SkinsPath, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetStrings(list: TStrings);
+begin
+  Load();
+  FChatConfig.SetStrings(list);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetAppBringToFront(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(HotKeys, AppBringToFront, value);
+  FChatConfig.UpdateFile;
+end;
+
+class procedure TDreamChatConfig.SetCryptoKey(value: string);
+begin
+  Load();
+  FChatConfig.WriteString(Crypto, Key, value);
+  FChatConfig.UpdateFile;
+end;
+
+initialization
+
+finalization
+
+  // free global variable
+  if FChatConfig <> nil then begin
+    FChatConfig.UpdateFile;
+    FreeAndNil(FChatConfig);
+  end;
+
+end.

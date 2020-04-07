@@ -1,0 +1,353 @@
+unit DChatPluginManager;
+{служит управеления плагинами, содержит их список}
+{загружает/выгружает, запускает/останавливает}
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, DChatPlugin,
+  DChatClientServerPlugin, DChatTestPlugin, DChatCommPlugin;
+
+const
+  PlaginManagerVersion = 4;//версия API интерфейса (набора функций, импортируемых из DLL)
+  DefaultServerIp = '127.0.0.1';
+  DefaultServerPort = 5557;
+
+type
+  TPluginManager = class(TPersistent)
+  private
+    { Private declarations }
+    FPath: string;
+    FPluginList: TStringList;
+    FNativePluginList: TStringList;
+    FFileList: TStringList;
+    Function GetFileList():TStringList;
+//    procedure GetFileList(var Value: TStringList);
+  public
+    { Public declarations }
+    Function LoadPlugin(NativePlugin: TDChatPlugin): boolean;
+    Function UnLoadPlugin(PluginObject: TObject): boolean;
+    Function LoadNativePlugin(FullPluginDllName:String): boolean;
+    Function UnLoadNativePlugin(PluginDLLName: String): boolean;
+    procedure OnMsgEventInternal(Mess: String);
+    property PluginList: TStringList read FPluginList write FPluginList;
+    property NativePluginList: TStringList read FNativePluginList write FNativePluginList;
+    property FileList: TStringList read GetFileList write FFileList;
+    constructor Create(Path: string);
+    destructor Destroy; override;
+  end;
+
+  FUNCTION CallBackFunction(Buffer:Pchar; Destination:cardinal):PChar;
+
+var
+  sglob: string;
+
+implementation
+
+FUNCTION CallBackFunction(Buffer:Pchar; Destination:cardinal):PChar;
+{VAR 
+    id:cardinal;
+    s:string;}
+BEGIN
+//DLL может вызвать эту функцию когда ей захочется
+{
+if FormDebug <> nil then
+  begin
+  if FormDebug.DebugMemo2 <> nil then
+    begin
+    if FormDebug.DebugMemo2.Lines.Count > 1500 then FormDebug.DebugMemo2.Lines.Clear;
+    case Destination of
+      0: FormDebug.DebugMemo2.Lines.Add(Buffer);
+      1: if (FormMain <> nil) then
+           begin
+           ChatLine := FormMain.GetMainLine;
+           if (ChatLine <> nil) and (ChatLine.ChatLineView <> nil) then
+             begin
+             ChatLine.ChatLineView.AddTextFromNewLine(buffer, SYSTEMTEXTSTYLE, nil);
+             ChatLine.ChatLineView.FormatTail;
+             ChatLine.ChatLineView.Repaint;
+             SendMessage(application.MainForm.handle,
+                         UM_INCOMMINGMESSAGE,
+                         UM_INCOMMINGMESSAGE_Redrawall, ChatLine.LineID);
+             end;
+           end;
+      end;
+    end;
+  end;
+sglob := 'CallBackFunction: Меня только что вызвала DLL!';
+result := @sglob[1];
+{SendMessage(application.MainForm.handle,
+            UM_INCOMMINGMESSAGE,
+            UM_INCOMMINGMESSAGE_ReDrawAll, 0);}
+sglob := 'CallBackFunction: Меня только что вызвала DLL!';
+result := @sglob[1];
+END;
+
+Constructor TPluginManager.Create(Path: string);
+Begin
+  inherited Create();
+  FPath := Path;
+  FPluginList := TStringList.Create;
+  FFileList := TStringList.Create;
+  FNativePluginList := TStringList.Create;
+End;
+
+Destructor TPluginManager.Destroy; {override;}
+var i: integer;
+Begin
+while FPluginList.Count > 0 do
+  begin
+  UnLoadPlugin(FPluginList.Objects[0]);
+  end;
+FPluginList.Free;
+for i := 0 to FNativePluginList.Count - 1 do
+  begin
+  UnLoadNativePlugin(FNativePluginList.Strings[i]);
+  end;
+FNativePluginList.Free;
+FFileList.Free;
+inherited Destroy;
+End;
+
+procedure TPluginManager.OnMsgEventInternal(Mess: String);
+begin
+      { TODO : Доделать вывод лога сообщений из этого объекта в верхний объект }
+//заглушка
+//эта процедура должна быть присвоена при создании TPluginManager из верхнего объекта
+end;
+
+Function TPluginManager.LoadPlugin(NativePlugin: TDChatPlugin): boolean;
+var DChatTestPlugin: TDChatTestPlugin;
+    DChatCommPlugin: TDChatCommPlugin;
+    DChatClientServerPlugin: TDChatClientServerPlugin;
+    i: integer;
+    ErrorMess, InitString: string;
+BEGIN
+//Внимание! Как только мы ввели новый тип плагина, не забываем прописать его здесь!!!
+//т.к. у разных типов плагинов могут быть разные ф-ций загрузки
+if NativePlugin <> nil then
+  begin
+  //узнаем все о плагине
+  result := true;
+  case NativePlugin.PluginInfo.PluginType of
+    Test:
+      begin
+        try
+          DChatTestPlugin := TDChatTestPlugin.Create(NativePlugin);
+          ErrorMess := DChatTestPlugin.InitFunction(DChatTestPlugin.DLLHandle, @CallBackFunction, PChar(DChatTestPlugin.Path));
+//          MessageBox(0, PChar(ErrorMess), 'TDChatTestPlugin', mb_ok);
+          i := FNativePluginList.IndexOf(NativePlugin.PluginInfo.PluginName);
+          NativePlugin.Free;
+          FNativePluginList.Delete(i);
+          FPluginList.AddObject(DChatTestPlugin.PluginInfo.PluginName, DChatTestPlugin);
+          //MessageBox(0, 'TDChatTestPlugin', '', mb_ok);
+        except
+          on E: EExportFunctionError do
+            begin
+            ErrorMess := e.Message;//'Error creating TDChatTestPlugin';
+            MessageBox(0, PChar(ErrorMess), PChar('Plugin function error!'), MB_ICONERROR);
+            e.Dispatch(ErrorMess);
+            result := false;
+            end;
+        end;
+      end;
+    ClientServer:
+      begin
+        try
+          if NativePlugin.PluginInfo.PluginAPIVersion = inttostr(DChatClientServerPluginVersion) then
+            begin
+            DChatClientServerPlugin := TDChatClientServerPlugin.Create(NativePlugin);
+            //временно тут формируем строку параметров для передачи в плагин
+            InitString := '[Client]' + #13 +
+                          'ServerIP=' + DefaultServerIp + #13 +
+                          'ServerPort=' + inttostr(DefaultServerPort) + #13 +
+                          'AutoConnect=true';
+            ErrorMess := DChatClientServerPlugin.InitFunction(DChatClientServerPlugin.DLLHandle, @CallBackFunction, PChar(DChatClientServerPlugin.Path), PChar(InitString));
+//          MessageBox(0, PChar(ErrorMess), 'TDChatTestPlugin', mb_ok);
+            i := FNativePluginList.IndexOf(NativePlugin.PluginInfo.PluginName);
+            NativePlugin.Free;
+            FNativePluginList.Delete(i);
+            FPluginList.AddObject(DChatClientServerPlugin.PluginInfo.PluginName, DChatClientServerPlugin);
+            //MessageBox(0, 'TDChatTestPlugin', '', mb_ok);
+            end
+          else
+            begin
+            ErrorMess := 'PluginManager can not loading plugin, becouse DChatClientServerPluginVersion  = ' +
+                         NativePlugin.PluginInfo.PluginAPIVersion + ' . But PluginManager know only = ' + IntToStr(DChatClientServerPluginVersion) ;
+            MessageBox(0, PChar(ErrorMess), PChar('Load DChatClientServerPlugin error!'), MB_ICONERROR);
+            result := false;
+            end;
+        except
+          on E: EExportFunctionError do
+            begin
+            ErrorMess := e.Message;//'Error creating TDChatTestPlugin';
+            MessageBox(0, PChar(ErrorMess), PChar('Plugin function error!'), MB_ICONERROR);
+            result := false;
+            e.Dispatch(ErrorMess);
+            end;
+        end;
+      end;
+    {Visual:
+      begin
+      end;
+    SoundEvents:
+      begin
+      end;
+    Protocol:
+      begin
+      end;}
+    Communication:
+      begin
+        try
+          DChatCommPlugin := TDChatCommPlugin.Create(NativePlugin);
+          i := FNativePluginList.IndexOf(NativePlugin.PluginInfo.PluginName);
+          NativePlugin.Free;
+          FNativePluginList.Delete(i);
+          FPluginList.AddObject(DChatCommPlugin.PluginInfo.PluginName, DChatCommPlugin);
+          //MessageBox(0, 'TDChatTestPlugin', '', mb_ok);
+        except
+          on E: EExportFunctionError do
+            begin
+            ErrorMess := e.Message;//'Error creating TDChatTestPlugin';
+            MessageBox(0, PChar(ErrorMess), PChar('Plugin function error!'), MB_ICONERROR);
+            result := false;
+            e.Dispatch(ErrorMess);
+            end;
+        end;
+      end
+  else
+    begin
+    MessageBox(0, PChar('Unknown plugin type: ' + NativePlugin.PluginInfo.PluginName), PChar('Error!'), MB_OK);
+    //FPluginList.AddObject(NativePlugin.PluginInfo.PluginName, NativePlugin);
+    result := false;
+    end;
+  end;
+  end
+else
+  result := false;
+END;
+
+Function TPluginManager.UnLoadPlugin(PluginObject: TObject): boolean;
+var i: integer;
+    Plugin: TDChatPlugin;
+    ErrorMess: string;
+Begin
+//Внимание! Как только мы ввели новый тип плагина, не забываем прописать его здесь!!!
+//для выгрузки плагина нужно преобразовать его к своему типу
+//т.к. у разных типов плагинов могут быть разные ф-ций выгрузки
+if PluginObject <> nil then
+  begin
+  Plugin := TDChatPlugin(PluginObject);
+  if Plugin is TDChatTestPlugin then
+    begin
+    //преобразуем плагин к его типу и вызываем деструктор именно этого типа!
+    Plugin := TDChatTestPlugin(PluginObject);
+    //MessageBox(0, 'TDChatTestPlugin(FPluginList.Objects[i])', '', mb_ok);
+    ErrorMess := TDChatTestPlugin(Plugin).ShutDownFunction;
+    end;
+  if Plugin is TDChatCommPlugin then
+    begin
+    //преобразуем плагин к его типу и вызываем деструктор именно этого типа!
+    Plugin := TDChatCommPlugin(PluginObject);
+    //MessageBox(0, 'TDChatTestPlugin(FPluginList.Objects[i])', '', mb_ok);
+    end;
+  if Plugin is TDChatClientServerPlugin then
+    begin
+    //преобразуем плагин к его типу и вызываем деструктор именно этого типа!
+    Plugin := TDChatClientServerPlugin(PluginObject);
+    //MessageBox(0, 'TDChatTestPlugin(FPluginList.Objects[i])', '', mb_ok);
+    ErrorMess := TDChatClientServerPlugin(Plugin).ShutDownFunction;
+    end;
+  i := FPluginList.IndexOf(Plugin.PluginInfo.PluginName);
+  FPluginList.Delete(i);
+  LoadNativePlugin(Plugin.Path + Plugin.Filename);
+  Plugin.Free;//вызывается деструктор уже преобразованного типа плагина (преобразование выше по коду!!!)
+  result := true;
+  end
+else
+  result := false;
+End;
+
+Function TPluginManager.LoadNativePlugin(FullPluginDllName: String): boolean;
+var ErrorMess: string;
+    NativePlugin: TDChatPlugin;
+    Version: integer;
+Begin
+//мы должны сначала подгружать все плагины, используя только общие для всех плагинов ф-ции
+//GetPluginTyp: TGetPluginType;
+//GetPluginInfo: TGetPluginInfo;
+//потом узнаем какой тип имеет плагин и уже тогда отдаем его в класс соответствующего плагина.
+try
+  NativePlugin := TDChatPlugin.Create(FullPluginDllName);
+  //если в конструкторе произошло исключение, то управление передается
+  //в секцию except, а NativePlugin остается равной nil.
+  FNativePluginList.AddObject(NativePlugin.PluginInfo.PluginName, NativePlugin);
+  try
+    Version := strtoint(NativePlugin.PluginInfo.PluginManagerAPIVersion);
+  except
+    Version := -1;
+  end;
+  if (length(NativePlugin.PluginInfo.PluginManagerAPIVersion) = 0) or
+     (Version < 0)
+   then
+    begin
+    ErrorMess := 'PluginManager: Property PluginManagerAPIVersion in plugin ' + NativePlugin.Filename + ' not valid!' + #13 +
+                 'Plugin may be working not stable! Must be: PluginManagerAPIVersion = ' + IntToStr(PlaginManagerVersion);
+    MessageBox(0, PChar(ErrorMess), PChar('Native function error! Loading ' + NativePlugin.Filename + ' error!'), MB_ICONERROR);
+    end;
+  result := true
+except
+  on e: EExportFunctionError do
+    begin
+    ErrorMess := e.Message;//'Error creating TDChatPlugin';
+    MessageBox(0, PChar(ErrorMess), PChar('Native function error! Loading error!'), MB_ICONERROR);
+    e.Dispatch(ErrorMess);
+    //если не убить исключение оно пойдет прерывать все процедуры которые 
+    //находятся выше и так до тех пор пока не выйдет на самый верх.
+    result := false;
+    end;
+end;
+End;
+
+Function TPluginManager.UnLoadNativePlugin(PluginDLLName: String): boolean;
+var i: integer;
+    NativePlugin: TDChatPlugin;
+Begin
+//Выгружаем нативный плагин
+i := FNativePluginList.IndexOf(PluginDLLName);
+if i >= 0 then
+  begin
+  NativePlugin := TDChatPlugin(FNativePluginList.Objects[i]);
+  NativePlugin.Free;
+  result := true;
+  end
+else
+  result := false;
+End;
+
+Function TPluginManager.GetFileList():TStringList;
+//Function TPluginManager.GetFileList(var Value: TStringList):TStringList;
+//Procedure TPluginManager.GetFileList(var Value: TStringList);
+var sr: TSearchRec;
+begin
+FFileList.Clear;
+//if FindFirst('*.dll', faAnyFile, sr) <> 0 then
+if FindFirst(FPath + '*.dll', faAnyFile, sr) <> 0 then
+  begin
+  MessageBox(0, 'Hе найдено подключаемых модулей.', 'GetFileList', mb_OK);
+  FindClose(sr);
+  result := FFileList;
+  exit;
+  end;
+
+//  MessageBox(0, PChar(sr.Name), 'GetFileList1', mb_OK);
+repeat
+//  MessageBox(0, PChar(sr.Name), 'GetFileList1', mb_OK);
+  FFileList.Add(FPath + sr.Name);
+until FindNext(sr) <> 0;
+
+FindClose(sr);
+result := FFileList;
+end;
+
+end.

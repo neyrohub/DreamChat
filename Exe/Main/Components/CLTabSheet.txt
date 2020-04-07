@@ -1,0 +1,4 @@
+object ChatLineTabSheet: TsTabSheet
+  Caption = 'Общий чат'
+  ImageIndex = 1
+end

@@ -1,0 +1,5 @@
+object ChatSplitter: TsSplitter
+  Width = 5
+  Cursor = crHSplit
+  Align = alRight
+end

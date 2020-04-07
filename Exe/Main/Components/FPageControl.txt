@@ -1,0 +1,8 @@
+object PageControl1: TsPageControl
+  Left = 1
+  Top = 1
+  Width = 533
+  Height = 271
+  Align = alClient
+  TabOrder = 1
+end

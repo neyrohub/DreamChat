@@ -1,0 +1,29 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = DreamChat.exe events.dll tcpkrnl.dll mskrnl.dll
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+DreamChat.exe: DreamChat.dpr
+  $(DCC)
+
+events.dll: ..\Plugins\Events\events.dpr
+  $(DCC)
+
+tcpkrnl.dll: ..\Plugins\Communication\tcp\tcpkrnl.dpr
+  $(DCC)
+
+mskrnl.dll: ..\Plugins\Communication\mailslot\mskrnl.dpr
+  $(DCC)
+
+

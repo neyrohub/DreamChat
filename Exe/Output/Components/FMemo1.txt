@@ -1,0 +1,10 @@
+object Memo1: TsMemo
+  Left = 1
+  Top = 1
+  Width = 532
+  Height = 28
+  Align = alBottom
+  ScrollBars = ssVertical
+  TabOrder = 1
+  Visible = false
+end

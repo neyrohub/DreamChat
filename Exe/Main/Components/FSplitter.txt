@@ -1,0 +1,9 @@
+object Splitter1: TsSplitter
+  Left = 1
+  Top = 269
+  Width = 533
+  Height = 3
+  Cursor = crVSplit
+  Align = alBottom
+  Visible = False
+end

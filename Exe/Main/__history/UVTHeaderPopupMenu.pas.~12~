@@ -1,0 +1,908 @@
+unit uVTHeaderPopupMenu;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Menus, Classes, Buttons, Graphics,
+  Controls, ComCtrls, StdCtrls, ExtCtrls, sChatView,
+  VirtualTrees, ShellAPI,
+  VTHeaderPopup, ImgList, uGifVirtualStringTree, Dialogs,
+  uLineNode, uChatUser, uFormPassword, uFormUserInfo, sSpeedButton,
+  sPageControl, sMemo, sEdit, sSplitter, sPanel, sButton, sDialogs,
+//баженов
+  DChatClientServerPlugin,
+  USettings;
+//баженов
+
+Const
+//т.к. у нас один обработчик клика по строчке всплываеющего меню, то по этим
+//константам обработчик понимает по какому именно пункту мы кликнули
+//константы храняться в .TAG у каждого пункта меню
+//.Command - read only (((
+  ONMENUTUserSendPrivateMessage       = 1;
+  ONMENUTUserSendPrivateMessageToAll  = 2;
+  ONMENUTUserCreatePrivateChat        = 3;
+  ONMENUTUserCreateLine               = 4;
+  ONMENUTLineNodeCreatePrivateChat    = 5;
+  ONMENUTLineNodeConnectToPrivateChat = 6;
+  ONMENUTLineNodeConnectToLine        = 7;
+  ONMENUTChatViewClosePrivateChat     = 8;
+  ONMENUTTreeViewRefresh              = 9;
+  ONMENURxTrayExit                    = 10;
+  ONMENUTSpeedButtonMessagesState     = 11;
+  ONMENUTUserIgnore                   = 12;
+  ONMENUTDebugMemo1SaveLog            = 13;
+  ONMENUTDebugMemo2SaveLog            = 14;
+  ONMENUTTreeViewUserInfo             = 15;
+  ONMENUTUserSeeShare                 = 16;
+  ONMENUTUserWriteNickName            = 17;
+//Баженов
+  ONMENUTUserPluginClick              = 100;//внимание! от 100 и выше идут плагины!!!
+
+type
+  TMenuItemId = class(TMenuItem)
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    Id: Integer;
+    DChatClientServerPlugin: TDChatClientServerPlugin;
+  end;
+//Баженов
+
+type
+  TDynamicVTHPopupMenu = class(TVTHeaderPopupMenu)
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    FParentChatLine:TObject;//из-за невозможности подключить в USES модуль
+                            //uChatLine нельзя сделать эту переменную
+                            //типа FParentChatLine:TChatLine
+    MenuItemId: TMenuItemId;
+    FPDNode : PDataNode;
+    FVirtualNode: PVirtualNode;
+    SpeedButtonNumber: integer;   //сюда записывается номер кнопки, иначе никак
+    SpeedButton: TsSpeedButton;
+    constructor CreateDVTH(AComponent:TComponent; ParentChatLine: TObject);{override;}
+    destructor Destroy;override;
+    procedure StringToComponent(Component: TComponent; Value: string);
+    procedure OnComponentClick(Component: TComponent; X, Y: Integer);
+    PROCEDURE OnMenuClick(Sender: TObject);
+    procedure AddNickLinkMenu(Component: TComponent; X, Y: Integer;
+                          tUser: TChatUser);
+    procedure AddUserMenu(Component: TComponent; X, Y: Integer;
+                          PDNode: PDataNode; VirtualNode:PVirtualNode);
+    procedure AddPrivateChatMenu(Component: TComponent; X, Y: Integer;
+                          PDNode: PDataNode ; VirtualNode:PVirtualNode);
+    procedure AddLineMenu(Component: TComponent; X, Y: Integer;
+                          PDNode: PDataNode ; VirtualNode:PVirtualNode);
+    procedure OnAdvancedDrawItem(Sender: TObject; ACanvas: TCanvas;
+                               ARect: TRect; State: TOwnerDrawState);
+    procedure OnMeasureItem(Sender: TObject; ACanvas: TCanvas;
+                               var Width, Height: Integer);
+  end;
+
+var
+  Bitmap: TBitmap;
+  Component: TWinControl;
+
+implementation
+
+uses
+  uFormMain, uchatline, uFormDebug, PathBuilder, DreamChatConfig, ImageLoader;
+
+procedure TDynamicVTHPopupMenu.StringToComponent(Component: TComponent; Value: string);
+var
+  StrStream:TStringStream;
+  ms: TMemoryStream;
+begin
+  StrStream := TStringStream.Create(Value);
+  try
+    ms := TMemoryStream.Create;
+    try
+      ObjectTextToBinary(StrStream, ms);
+      ms.position := 0;
+      ms.ReadComponent(Component);
+    finally
+      ms.Free;
+    end;
+  finally
+    StrStream.Free;
+  end;
+end;
+
+constructor TDynamicVTHPopupMenu.CreateDVTH(AComponent:TComponent; ParentChatLine: TObject);
+//var
+//    MS: TMemoryStream;
+begin
+inherited Create(AComponent);
+self.FParentChatLine := ParentChatLine;
+
+Self.Images := TImageList.Create(Self);
+self.OwnerDraw := true;
+
+//создаем готовые наборы менюшек
+//==== меню для TPanel ====
+MenuItemId := TMenuItemId.Create(Self);
+MenuItemId.Caption := 'Это меню для';
+self.Items.Add(MenuItemId);
+
+Bitmap := TBitmap.Create;
+end;
+
+destructor TDynamicVTHPopupMenu.Destroy;
+begin
+Bitmap.Free;
+inherited Destroy();
+end;
+
+procedure TDynamicVTHPopupMenu.OnComponentClick(Component: TComponent; X, Y: Integer);
+var i: integer;
+    StrList: TStringList;
+begin
+//FormMain.Caption := Component.name;
+//FormMain.Caption := '';
+Self.Items.Clear;
+self.Images.Clear;
+FParentChatLine := FormMain.GetActiveChatLine;
+
+if Component is TsSpeedButton then
+  begin
+  StrList := TStringList.Create;
+  SpeedButton := TsSpeedButton(Component);
+  if TsSpeedButton(Component).Name = 'SpeedButton3' then
+    begin
+    TDreamChatConfig.FillMessagesState0(StrList);
+//    FormMain.ChatConfig.ReadSectionValues('MessagesState0', StrList);
+    SpeedButtonNumber := 0;
+    end;
+  if TsSpeedButton(Component).Name = 'SpeedButton4' then
+    begin
+    TDreamChatConfig.FillMessagesState1(StrList);
+//    FormMain.ChatConfig.ReadSectionValues('MessagesState1', StrList);
+    SpeedButtonNumber := 1;
+    end;
+  if TsSpeedButton(Component).Name = 'SpeedButton5' then
+    begin
+    TDreamChatConfig.FillMessagesState2(StrList);
+    //FormMain.ChatConfig.ReadSectionValues('MessagesState2', StrList);
+    SpeedButtonNumber := 2;
+    end;
+  if TsSpeedButton(Component).Name = 'SpeedButton6' then
+    begin
+    TDreamChatConfig.FillMessagesState3(StrList);
+    //FormMain.ChatConfig.ReadSectionValues('MessagesState3', StrList);
+    SpeedButtonNumber := 3;
+    end;
+
+  if StrList.Count > 0 then
+    begin
+    for i := 0 to StrList.Count - 1 do
+      begin
+      MenuItemId := TMenuItemId.Create(Self);
+      MenuItemId.Caption := StrList.Strings[i];
+      MenuItemId.OnClick := OnMenuClick;
+      //MenuItemId.Command := ONMENUTSpeedButtonMessagesState;
+      MenuItemId.Tag := ONMENUTSpeedButtonMessagesState;
+      Self.Items.Add(MenuItemId);
+      end;
+    if uFormMain.FormMain.SkinManMain.Active then
+      uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+    self.Popup(X, Y);
+    end;
+  StrList.free;
+  end;
+if Component is TsEdit then
+  begin
+  {MenuItemId := TMenuItemId.Create(Self);
+  MenuItemId.Caption := 'Это меню для';
+  Self.Items.Add(MenuItemId);
+  MenuItemId := TMenuItemId.Create(Self);
+  MenuItemId.Caption := 'TPanel';
+  Self.Items.Add(MenuItemId);
+  if uFormMain.FormMain.SkinManMain.Active then
+    uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+  self.Popup(X, Y);}
+  end;
+if Component is TsPanel then
+  begin
+  MenuItemId := TMenuItemId.Create(Self);
+  MenuItemId.Caption := 'Это меню для';
+  Self.Items.Add(MenuItemId);
+  MenuItemId := TMenuItemId.Create(Self);
+  MenuItemId.Caption := 'TPanel';
+  Self.Items.Add(MenuItemId);
+  if uFormMain.FormMain.SkinManMain.Active then
+    uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+  self.Popup(X, Y);
+  end;
+if Component is TsPageControl then
+  begin
+  MenuItemId := TMenuItemId.Create(Self);
+  MenuItemId.Caption := 'Это меню для';
+  Items.Add(MenuItemId);
+  MenuItemId := TMenuItemId.Create(Self);
+  MenuItemId.Caption := 'TPageControl';
+  Items.Add(MenuItemId);
+  if uFormMain.FormMain.SkinManMain.Active then
+    uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+  Popup(X, Y);
+  end;
+if Component is TsChatView then
+  begin
+  if TChatLine(FParentChatLine) <> FormMain.GetMainLine then
+    begin
+    MenuItemId := TMenuItemId.Create(Self);
+    MenuItemId.Caption := fmInternational.Strings[I_CLOSE];//'Закрыть';
+
+//    MenuItemId.ImageIndex := Self.Images.AddMasked(TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_CLOSE].Bitmap[0],
+//                                       TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_CLOSE].Bitmap[0].TransparentColor);
+
+    MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_CLOSE).Bitmap[0],
+                                                 TDreamChatImageLoader.GetImage(G_POPUP_CLOSE).Bitmap[0].TransparentColor);
+
+    MenuItemId.OnClick := OnMenuClick;
+    //MenuItemId.Command := ONMENUTChatViewClosePrivateChat;
+    MenuItemId.Tag := ONMENUTChatViewClosePrivateChat;
+    Items.Add(MenuItemId);
+    {MenuItemId := TMenuItemId.Create(Self);
+    MenuItemId.Caption := 'TChatView';
+    Self.Items.Add(MenuItemId);}
+    end;
+  if uFormMain.FormMain.SkinManMain.Active then
+    uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+  Popup(X, Y);
+  end;
+if Component is TVirtualStringTree then
+  begin
+  MenuItemId := TMenuItemId.Create(Self);
+  MenuItemId.Caption := fmInternational.Strings[I_REFRESH];//Обновить
+//  MenuItemId.ImageIndex:=Self.Images.AddMasked(TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_Refresh].Bitmap[0],
+//                                       TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_Refresh].Bitmap[0].TransparentColor);
+
+  MenuItemId.ImageIndex:=Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_REFRESH).Bitmap[0],
+                                             TDreamChatImageLoader.GetImage(G_REFRESH).Bitmap[0].TransparentColor);
+
+  MenuItemId.OnClick := OnMenuClick;
+  //MenuItemId.Command := ONMENUTTreeViewRefresh;
+  MenuItemId.Tag := ONMENUTTreeViewRefresh;
+  Items.Add(MenuItemId);
+  if uFormMain.FormMain.SkinManMain.Active then
+    uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+  Popup(X, Y);
+  end;
+if (Component is TsMemo) then
+  begin
+  if TsMemo(Component).Name = 'DebugMemo1' then
+    begin
+    MenuItemId := TMenuItemId.Create(Self);
+    MenuItemId.Caption := fmInternational.Strings[I_SAVELOG];//Сохранить лог
+//    MenuItemId.ImageIndex:=Self.Images.AddMasked(TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_SAVE].Bitmap[0],
+//                                       TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_SAVE].Bitmap[0].TransparentColor);
+    MenuItemId.ImageIndex:=Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_SAVE).Bitmap[0],
+                                               TDreamChatImageLoader.GetImage(G_POPUP_SAVE).Bitmap[0].TransparentColor);
+
+
+    MenuItemId.OnClick := OnMenuClick;
+    //MenuItemId.Command := ONMENUTTreeViewRefresh;
+    MenuItemId.Tag := ONMENUTDebugMemo1SaveLog;
+    Items.Add(MenuItemId);
+    if uFormMain.FormMain.SkinManMain.Active then
+      uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+    Popup(X, Y);
+    end;
+  if TsMemo(Component).Name = 'DebugMemo2' then
+    begin
+    MenuItemId := TMenuItemId.Create(Self);
+    MenuItemId.Caption := fmInternational.Strings[I_SAVELOG];//Сохранить лог
+//    MenuItemId.ImageIndex:=Self.Images.AddMasked(TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_SAVE].Bitmap[0],
+//                                       TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_SAVE].Bitmap[0].TransparentColor);
+    MenuItemId.ImageIndex:=Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_SAVE).Bitmap[0],
+                                               TDreamChatImageLoader.GetImage(G_POPUP_SAVE).Bitmap[0].TransparentColor);
+
+    MenuItemId.OnClick := OnMenuClick;
+    //MenuItemId.Command := ONMENUTTreeViewRefresh;
+    MenuItemId.Tag := ONMENUTDebugMemo2SaveLog;
+    Items.Add(MenuItemId);
+    if uFormMain.FormMain.SkinManMain.Active then
+      uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+    Popup(X, Y);
+    end;
+  end;
+end;
+
+procedure TDynamicVTHPopupMenu.AddNickLinkMenu(Component: TComponent; X, Y: Integer;
+                                           tUser: TChatUser);
+var PDNode: PDataNode;
+ //   i: integer;
+    VirtualNode: PVirtualNode;
+begin
+//создаем меню, появляющегося при нажатии на юзера в дереве
+//MessageBox(0, PChar(TChatLine(self.FParentChatLine).ChatLineName), PChar(inttostr(0)) ,mb_ok);
+FParentChatLine := FormMain.GetActiveChatLine;
+VirtualNode := TChatLine(FParentChatLine).ChatLineTree.GetFirst;
+while VirtualNode <> nil do
+  begin
+  PDNode := TChatLine(FParentChatLine).ChatLineTree.GetNodeData(VirtualNode);
+  if PDNode.User = tUser then
+    begin
+    AddUserMenu(Component, X, Y, PDNode, VirtualNode);
+    break;
+    end;
+  VirtualNode := VirtualNode.NextSibling;
+  end;
+end;
+
+procedure TDynamicVTHPopupMenu.AddUserMenu(Component: TComponent; X, Y: Integer;
+                                  PDNode: PDataNode ; VirtualNode:PVirtualNode);
+var
+  p: TPoint;
+//баженов
+    i, MenuNumb : integer;
+    ClientServerPlugin : TDChatClientServerPlugin;
+    MenuCaption: string;
+//баженов
+begin
+//создаем меню, появляющегося при нажатии на юзера в дереве
+//MessageBox(0, PChar(TChatLine(self.FParentChatLine).ChatLineName), PChar(inttostr(0)) ,mb_ok);
+FParentChatLine := FormMain.GetActiveChatLine;
+FPDNode := PDNode;
+FVirtualNode := VirtualNode;
+Self.Items.Clear;
+Self.Images.Clear;
+//========= Добавляем строчку меню: Написать имя
+self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := fmInternational.Strings[I_WRITENICKNAME] + ' ' +
+                         PDNode.User.DisplayNickName;//Личное сообщение
+//Self.MenuItemId.Command := ONMENUTUserSendPrivateMessage;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.Tag := ONMENUTUserWriteNickName;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.OnClick := OnMenuClick;
+
+//MenuItemId.ImageIndex := Self.Images.AddMasked(TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_NICKNAME].Bitmap[0],
+//                                       TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_NICKNAME].Bitmap[0].TransparentColor);
+self.MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_NICKNAME).Bitmap[0],
+                                             TDreamChatImageLoader.GetImage(G_POPUP_NICKNAME).Bitmap[0].TransparentColor);
+
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: [---------------------]
+Self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := '-';
+Self.MenuItemId.Tag := 0;//короче надо в одном обработчике различать разные клики
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: Личное сообщение
+Self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := fmInternational.Strings[I_PRIVATEMESSAGE] + ' ' +
+                         PDNode.User.DisplayNickName;//Личное сообщение
+//Self.MenuItemId.Command := ONMENUTUserSendPrivateMessage;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.Tag := ONMENUTUserSendPrivateMessage;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.OnClick := OnMenuClick;
+//MenuItemId.ImageIndex := Self.Images.AddMasked(TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_PRIVATE_MESSAGE].Bitmap[0],
+//                                       TChatLine(FParentChatLine).ChatLineTree.TreeGifImages[G_POPUP_PRIVATE_MESSAGE].Bitmap[0].TransparentColor);
+self.MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_PRIVATE_MESSAGE).Bitmap[0],
+                                             TDreamChatImageLoader.GetImage(G_POPUP_PRIVATE_MESSAGE).Bitmap[0].TransparentColor);
+
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: Личное сообщение всем
+Self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := fmInternational.Strings[I_PRIVATEMESSAGETOALL] + ' ';//Личное сообщение всем
+Self.MenuItemId.Tag := ONMENUTUserSendPrivateMessageToAll;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.OnClick := OnMenuClick;
+self.MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_MASSMESSAGE).Bitmap[0],
+                                             TDreamChatImageLoader.GetImage(G_POPUP_MASSMESSAGE).Bitmap[0].TransparentColor);
+
+
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: [---------------------]
+Self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := '-';
+Self.MenuItemId.Tag := 0;//короче надо в одном обработчике различать разные клики
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//=========
+//if AnsiCompareText(TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].ComputerName, TChatLine(FParentChatLine).LocalComputerName) <> 0 then
+if AnsiCompareText(FPDNode.User.ComputerName, TChatLine(FParentChatLine).LocalComputerName) <> 0 then
+  begin
+  //========= Добавляем строчку меню: Личный чат с
+  Self.MenuItemId := TMenuItemId.Create(Self);
+  //Self.MenuItemId.Caption := 'Личный чат с ' + TChatLine(self.FParentChatLine).ChatLineUsers[PDNode.DataUserId].DisplayNickName;
+  Self.MenuItemId.Caption := fmInternational.Strings[I_PRIVATEWITH] + ' ' + PDNode.User.DisplayNickName;//Личный чат с
+  Self.MenuItemId.Tag := ONMENUTUserCreatePrivateChat;
+  Self.MenuItemId.OnClick := OnMenuClick;
+  self.MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_PRIVATE_CHAT).Bitmap[0],
+                                         TDreamChatImageLoader.GetImage(G_POPUP_PRIVATE_CHAT).Bitmap[0].TransparentColor);
+  Self.Items.Add(DynamicPopupMenu.MenuItemId);
+  end;
+//========= Добавляем строчку меню: Создать линию
+Self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := fmInternational.Strings[I_CREATELINE];//Создать линию
+Self.MenuItemId.Tag := ONMENUTUserCreateLine;
+Self.MenuItemId.OnClick := OnMenuClick;
+MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_CREATE_LINE).Bitmap[0],
+                                             TDreamChatImageLoader.GetImage(G_POPUP_CREATE_LINE).Bitmap[0].TransparentColor);
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: [---------------------]
+Self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := '-';
+Self.MenuItemId.Tag := 0;//короче надо в одном обработчике различать разные клики
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: Перейти к ресурсам компьютера
+Self.MenuItemId := TMenuItemId.Create(Self);
+if ChatMode = cmodTCP then
+  Self.MenuItemId.Caption := fmInternational.Strings[I_SEESHARE] + FPDNode.User.IP
+else
+  Self.MenuItemId.Caption := fmInternational.Strings[I_SEESHARE] + FPDNode.User.ComputerName;
+Self.MenuItemId.Tag := ONMENUTUserSeeShare;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.OnClick := OnMenuClick;
+MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_SEE_SHARE).Bitmap[0],
+                                       TDreamChatImageLoader.GetImage(G_POPUP_SEE_SHARE).Bitmap[0].TransparentColor);
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: Игнорировать все сообщения
+//if AnsiCompareText(TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].ComputerName, TChatLine(FParentChatLine).LocalComputerName) <> 0 then
+if AnsiCompareText(FPDNode.User.ComputerName, TChatLine(FParentChatLine).LocalComputerName) <> 0 then
+  begin
+  Self.MenuItemId := TMenuItemId.Create(Self);
+  //if TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].Ignored = true then
+  if FPDNode.User.Ignored = true then
+    begin
+    Self.MenuItemId.Checked := true;
+    end
+  else
+    begin
+    Self.MenuItemId.Checked := false;
+    end;
+  Self.MenuItemId.Caption := fmInternational.Strings[I_TOTALIGNOR];
+  Self.MenuItemId.Tag := ONMENUTUserIgnore;
+  Self.MenuItemId.OnClick := OnMenuClick;
+  MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_IGNORED).Bitmap[0],
+                                               TDreamChatImageLoader.GetImage(G_POPUP_IGNORED).Bitmap[0].TransparentColor);
+  Self.Items.Add(DynamicPopupMenu.MenuItemId);
+  end;
+
+//баженов
+//========= Добавляем строчку меню: [ от Плагинов ]
+//тут вставить Меню предачи/приема файла!
+with FormMain do
+begin
+for i := 0 to FSettings.listBox2.Items.Count - 1 do
+  begin
+  if FSettings.listBox2.Items.Objects[i] <> nil then
+    begin
+    if FSettings.listBox2.Items.Objects[i] is TDChatClientServerPlugin then
+      begin
+      //если выделен плагин типа TDChatTestPlugin, то у него есть
+      //функция TestFunction1, TestFunction2
+      ClientServerPlugin := TDChatClientServerPlugin(FSettings.listBox2.Items.Objects[i]);
+      MenuNumb := 0;
+      MenuCaption := ClientServerPlugin.ExecuteCommand('GetMenuItemId', Pchar(inttostr(MenuNumb)));
+      while length(MenuCaption) > 0 do
+        begin
+        MenuItemId := TMenuItemId.Create(Self);
+        MenuItemId.Tag := ONMENUTUserPluginClick + i;
+        MenuItemId.Id := MenuNumb;//0;
+        MenuItemId.DChatClientServerPlugin := ClientServerPlugin;
+        MenuItemId.OnClick := OnMenuClick;
+        //MenuItemId.Caption := 'Это меню для';
+        MenuItemId.Caption := MenuCaption;
+        Self.Items.Add(MenuItemId);
+        inc(MenuNumb);
+        MenuCaption := ClientServerPlugin.ExecuteCommand('GetMenuItem', Pchar(inttostr(MenuNumb)));
+        end;
+      end;
+    end;
+  end;
+end;
+//баженов
+
+
+//========= Добавляем строчку меню: [---------------------]
+Self.MenuItemId := TMenuItemId.Create(Self);
+Self.MenuItemId.Caption := '-';
+Self.MenuItemId.Tag := 0;//короче надо в одном обработчике различать разные клики
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+//========= Добавляем строчку меню: О пользователе
+MenuItemId := TMenuItemId.Create(Self);
+MenuItemId.Caption := fmInternational.Strings[I_USERINFO];//О пользователе
+MenuItemId.OnClick := OnMenuClick;
+//FormUI.GetUserInfo(TChatLine(FParentChatLine), FPDNode.DataUserId);
+FormUI.GetUserInfo(TChatLine(FParentChatLine), FPDNode.User);
+
+Bitmap.Height := FormUI.UserInfoChatView.Height;
+Bitmap.Width := FormUI.UserInfoChatView.Width;
+FormUI.UserInfoChatView.PaintTo(Bitmap.Canvas.Handle, 0, 0);
+//bitblt(Bitmap.Canvas.Handle, 0, 0, FormUI.ChatView1.Width, FormUI.ChatView1.Height,
+//       GetDC(FormUI.ChatView1.Handle), 0, 0, SRCCOPY);
+MenuItemId.OnAdvancedDrawItem := OnAdvancedDrawItem;
+MenuItemId.OnMeasureItem := OnMeasureItem;
+MenuItemId.Tag := ONMENUTTreeViewUserInfo;
+Items.Add(MenuItemId);
+//=========
+if uFormMain.FormMain.SkinManMain.Active then
+  uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+
+p.X := X;
+p.Y := Y;
+p := (Component as TControl).ClientToScreen(p);
+
+Self.Popup(p.X, p.Y {MouseX, MouseY});
+end;
+
+procedure TDynamicVTHPopupMenu.AddPrivateChatMenu(Component: TComponent; X, Y: Integer;
+                                  PDNode: PDataNode ; VirtualNode:PVirtualNode);
+var
+  User: TChatUser;
+  p: TPoint;
+    //Баженов
+    MenuItemId: TMenuItemId;
+    //Баженов
+begin
+//создаем меню, появляющееся при нажатии на Приват в дереве
+FParentChatLine := FormMain.GetActiveChatLine;
+FPDNode := PDNode;
+Self.Items.Clear;
+Self.MenuItemId := TMenuItemId.Create(Self);
+//User := TChatLine(self.FParentChatLine).ChatLineUsers[PDNode.DataUserId];
+User := PDNode.User;
+//Self.MenuItem.Caption := 'Войти в приват ' + TLineNode(User.ChatLinesList.Objects[PDNode.DataLineId]).DisplayLineName;
+Self.MenuItemId.Caption := fmInternational.Strings[I_COMETOPRIVATE] + ' ' + TLineNode(PDNode.LineNode).DisplayLineName;
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+Self.MenuItemId.Tag := ONMENUTLineNodeConnectToPrivateChat;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.OnClick := OnMenuClick;
+Self.MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_PRIVATE_CHAT).Bitmap[0],
+                                            TDreamChatImageLoader.GetImage(G_POPUP_PRIVATE_CHAT).Bitmap[0].TransparentColor);
+if uFormMain.FormMain.SkinManMain.Active then
+  uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+
+p.X := X;
+p.Y := Y;
+p := (Component as TControl).ClientToScreen(p);
+
+Self.Popup(p.X, p.Y {MouseX, MouseY});
+end;
+
+procedure TDynamicVTHPopupMenu.AddLineMenu(Component: TComponent; X, Y: Integer;
+                                  PDNode: PDataNode ; VirtualNode:PVirtualNode);
+var
+  User: TChatUser;
+  p:TPoint;
+begin
+//создаем меню, появляющееся при нажатии на Линия в дереве
+FParentChatLine := FormMain.GetActiveChatLine;
+FPDNode := PDNode;
+Self.Items.Clear;
+Self.MenuItemId := TMenuItemId.Create(Self);
+//User := TChatLine(self.FParentChatLine).ChatLineUsers[PDNode.DataUserId];
+User := PDNode.User;
+//Self.MenuItem.Caption := 'Войти в линию ' + TLineNode(User.ChatLinesList.Objects[PDNode.DataLineId]).DisplayLineName;
+Self.MenuItemId.Caption := fmInternational.Strings[I_COMETOLINE] + ' ' + TLineNode(PDNode.LineNode).DisplayLineName;
+Self.Items.Add(DynamicPopupMenu.MenuItemId);
+Self.MenuItemId.Tag := ONMENUTLineNodeConnectToLine;//короче надо в одном обработчике различать разные клики
+Self.MenuItemId.OnClick := OnMenuClick;
+Self.MenuItemId.ImageIndex := Self.Images.AddMasked(TDreamChatImageLoader.GetImage(G_POPUP_CREATE_LINE).Bitmap[0],
+                                                  TDreamChatImageLoader.GetImage(G_POPUP_CREATE_LINE).Bitmap[0].TransparentColor);
+if uFormMain.FormMain.SkinManMain.Active then
+  uFormMain.FormMain.SkinManMain.SkinableMenus.HookPopupMenu(self,True);
+
+p.X := X;
+p.Y := Y;
+p := (Component as TControl).ClientToScreen(p);
+
+Self.Popup(p.X, p.Y {MouseX, MouseY});
+//Self.on
+end;
+
+PROCEDURE TDynamicVTHPopupMenu.OnMenuClick(Sender: TObject);
+var VirtualKey: Char;
+    User: TChatUser;
+    ChatLine: TChatLine;
+    pResult:PChar;
+    sResult:string;
+   // c: cardinal;
+    //StartupInfo: TStartupInfo;
+    //ProcessInfo: TProcessInformation;
+//Баженов
+    ClientServerPlugin : TDChatClientServerPlugin;
+    n, i : integer;
+    InitString: string;
+//Баженов
+begin
+FParentChatLine := FormMain.GetActiveChatLine;
+VirtualKey := Char(13);//VK_RETURN;
+//case TMenuItem(Sender).Command of
+case TMenuItem(Sender).Tag of
+  ONMENUTUserWriteNickName:
+    begin
+    FormMain.Edit1.Text := FPDNode.User.NickName + ': ';
+    FormMain.Edit1.SelStart := length(FormMain.Edit1.Text);
+    //FormMain.Edit1KeyPress(Self, VirtualKey);
+    end;
+  ONMENUTUserSendPrivateMessage:
+    begin
+    //FormMain.Edit1.Text := '/msg "' + TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].DisplayNickName + '" ';
+    FormMain.Edit1.Text := '/msg "' + FPDNode.User.DisplayNickName + '" ';
+    FormMain.Edit1.SelStart := length(FormMain.Edit1.Text);
+    //FormMain.Edit1KeyPress(Self, VirtualKey);
+    end;
+  ONMENUTUserSendPrivateMessageToAll:
+    begin
+    FormMain.Edit1.Text := '/msg "*" ';
+    FormMain.Edit1.SelStart := length(FormMain.Edit1.Text);
+    //FormMain.Edit1KeyPress(Self, VirtualKey);
+    end;
+  ONMENUTUserCreatePrivateChat:
+    begin
+    //FormMain.Edit1.Text := '/chat "' + TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].DisplayNickName + '"';
+    FormMain.Edit1.Text := '/chat "' + FPDNode.User.DisplayNickName + '"';
+    FormMain.Edit1.OnKeyPress(Self, VirtualKey);
+    end;
+  ONMENUTUserCreateLine:
+    begin
+    if ShowPasswordForm(false, '', pResult) = mrOk then
+      begin
+      sResult := pResult;
+      FormMain.Edit1.Text := '/line ' + sResult;
+      //MessageBox(0, PChar(FormMain.Edit1.Text), PChar(inttostr(0)), mb_ok);
+      FormMain.Edit1.OnKeyPress(Self, VirtualKey);
+      end;
+    end;
+  ONMENUTChatViewClosePrivateChat:
+    begin
+    FormMain.Edit1.Text := '/close';
+    FormMain.Edit1.OnKeyPress(Self, VirtualKey);
+    //FormMain.Edit1KeyPress(Self, VirtualKey);
+    end;
+  ONMENUTLineNodeCreatePrivateChat:
+    begin
+    //FormMain.Edit1.Text := '/chat "' + TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].DisplayNickName + '"';
+    FormMain.Edit1.Text := '/chat "' + FPDNode.User.DisplayNickName + '"';
+    //FormMain.Edit1KeyPress(Self, VirtualKey);
+    end;
+  ONMENUTLineNodeConnectToPrivateChat:
+    begin
+    //User := TChatLine(self.FParentChatLine).ChatLineUsers[FPDNode.DataUserId];
+    FormMain.Edit1.Text := '/connectchat "' + TLineNode(FPDNode.LineNode).LineName + '"';
+    FormMain.Edit1KeyPress(Self, VirtualKey);
+    end;
+  ONMENUTLineNodeConnectToLine:
+    begin
+    //User := TChatLine(self.FParentChatLine).ChatLineUsers[FPDNode.DataUserId];
+    //ChatLine := FormMain.GetChatLineByName(TLineNode(User.ChatLinesList.Objects[FPDNode.DataLineId]).LineName);
+    ChatLine := FormMain.GetChatLineByName(TLineNode(FPDNode.LineNode).LineName);
+    if ChatLine <> nil then
+      begin
+      //если такая линия/приват уже существуют, делаем активным его TabSheet
+      FormMain.PageControl1.ActivePageIndex := ChatLine.ChatLineTabSheet.PageIndex;
+      //if User = TChatLine(self.FParentChatLine).GetLocalUser() then
+      end
+    else
+      begin
+      //такой линии нет, будем создавать
+      //if ShowPasswordForm(true, PChar(TLineNode(User.ChatLinesList.Objects[FPDNode.DataLineId]).LineName), pResult) = mrOk then
+      if ShowPasswordForm(true, PChar(TLineNode(FPDNode.LineNode).LineName), pResult) = mrOk then
+        begin
+        sResult := pResult;
+        FormMain.Edit1.Text := '/connectline ' + sResult;
+        FormMain.Edit1.OnKeyPress(Self, VirtualKey);
+        end;
+      end;
+    end;
+  ONMENURxTrayExit:
+    begin
+      if MinimizeOnClose then
+      begin
+        MinimizeOnClose := False;
+        FormMain.Close;
+        MinimizeOnClose := True;
+      end
+      else
+        FormMain.Close;
+    end;
+  ONMENUTTreeViewRefresh:
+    begin
+    ChatLine := TChatLine(self.FParentChatLine);
+    {for c := 0 to ChatLine.UsersCount - 1 do
+      begin
+      //FormMain.ShowUserInTree(ChatLine, c, ShowUser_REDRAW);
+      end;}
+    FormMain.ShowAllUserInTree(ChatLine);
+    end;
+  ONMENUTTreeViewUserInfo:
+    begin
+    //FormUI.GetUserInfo(TChatLine(FParentChatLine), FPDNode.DataUserId);
+    FormUI.GetUserInfo(TChatLine(FParentChatLine), FPDNode.User);
+    if FormUI.Visible = true then
+      FormUI.BringToFront
+    else
+      FormUI.Visible := true;
+    end;
+  ONMENUTSpeedButtonMessagesState:
+    begin
+    User := FormMain.GetMainLine.GetLocalUser;
+    User.MessageStatus.strings[SpeedButtonNumber] := TMenuItem(Sender).Caption;
+    SpeedButton.Click;
+    end;
+  ONMENUTUserSeeShare:
+    begin
+    {FillChar(StartupInfo, SizeOf(StartupInfo), #0);
+    StartupInfo.cb := SizeOf(StartupInfo);
+    StartupInfo.dwFlags := STARTF_USESTDHANDLES;
+    StartupInfo.wShowWindow := SW_SHOWNORMAL;//SW_HIDE;
+    StartupInfo.hStdOutput := 0;
+    StartupInfo.hStdInput := 0;}
+    if ChatMode = cmodTCP then
+    begin
+      if ShellExecute(0, 'explore', PChar('\\' + FPDNode.User.IP +'\'), '', '', SW_SHOWNORMAL)<33 then
+        TDebugMan.AddLine2('Can''t open \\' + FPDNode.User.IP +'\'); //FormDebug.DebugMemo2.Lines.Add('Can''t open \\' + FPDNode.User.IP +'\');
+      {CreateProcess(nil, PChar('explorer.exe \\' + FPDNode.User.IP), nil, nil, True,
+                    CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
+                    nil, nil, StartupInfo, ProcessInfo)}
+    end
+    else
+      if ShellExecute(0, 'explore', PChar('\\' + FPDNode.User.ComputerName +'\'), '', '', SW_SHOWNORMAL)<33 then
+        TDebugMan.AddLine2('Can''t open \\' + FPDNode.User.ComputerName +'\'); //FormDebug.DebugMemo2.Lines.Add('Can''t open \\' + FPDNode.User.ComputerName +'\');
+      {CreateProcess(nil, PChar('explorer.exe \\' + FPDNode.User.ComputerName), nil, nil, True,
+                    CREATE_NEW_CONSOLE or NORMAL_PRIORITY_CLASS,
+                    nil, nil, StartupInfo, ProcessInfo);}
+    end;
+  ONMENUTUserIgnore:
+    begin
+    //if TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].Ignored = true then
+    if FPDNode.User.Ignored = true then
+      begin
+      //TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].Ignored := false;
+      FPDNode.User.Ignored := false;
+      TMenuItem(Sender).Checked := false;
+      end
+    else
+      begin
+      //TChatLine(FParentChatLine).ChatLineUsers[FPDNode.DataUserId].Ignored := true;
+      FPDNode.User.Ignored := true;
+      TMenuItem(Sender).Checked := true;
+      end;
+    FormMain.ShowAllUserInTree(TChatLine(FParentChatLine));
+    end;
+  ONMENUTDebugMemo1SaveLog:
+    begin
+    TDebugMan.SaveToFile1(TPathBuilder.GetExePath() + 'ObjectLog.txt'); //FormDebug.DebugMemo1.Lines.SaveToFile(TPathBuilder.GetExePath() + 'ObjectLog.txt');
+    end;
+  ONMENUTDebugMemo2SaveLog:
+    begin
+    TDebugMan.SaveToFile1(TPathBuilder.GetExePath() + 'ProtocolLog.txt'); //FormDebug.DebugMemo2.Lines.SaveToFile(TPathBuilder.GetExePath() + 'ProtocolLog.txt');
+    end
+  else
+    //баженов
+    begin
+    if TMenuItemId(Sender).Tag >= ONMENUTUserPluginClick then
+      begin
+//      sMessageDlg(inttostr(TMenuItemId(Sender).tag), 'ONMENUTUserPluginClick ', mtInformation, [mbOk], 0)
+//      if FSettings.listBox2.Items.Objects[TMenuItemId(Sender).Tag - 100] is TDChatClientServerPlugin then
+//        begin
+//        ClientServerPlugin := TDChatClientServerPlugin(FSettings.listBox2.Items.Objects[TMenuItemId(Sender).Tag - 100]);
+//        ClientServerPlugin.ShowPluginForm;
+//        end;
+//      end
+      if TMenuItemId(Sender).DChatClientServerPlugin <> nil then
+        begin
+        if TMenuItemId(Sender).DChatClientServerPlugin is TDChatClientServerPlugin then
+          begin
+          ClientServerPlugin := TMenuItemId(Sender).DChatClientServerPlugin;
+          if ClientServerPlugin.PluginInfo.PluginName = 'File client' then
+            begin
+            //если выделен плагин типа TDChatTestPlugin, то у него есть
+            //функция TestFunction1, TestFunction2
+            n := TMenuItemId(Sender).Id;//{ - Trunc(TMenuItem(Sender).Tag/100)*100};
+              case n of
+              0:
+                begin
+                if ClientServerPlugin <> nil then
+                  begin
+                  Randomize;
+                  InitString := '[Client]' + #13 +
+                                  'ServerIP=127.0.0.1'+ #13 +
+      //                          'ServerPort=5557'+ #13 +
+                                  'ServerPort=' + inttostr(random(10000)) + #13 +
+                                  'AutoConnect=true';
+                  ClientServerPlugin.ExecuteCommand('Connect', PChar(InitString));
+      //            Memo2.Lines.Add('ExecuteCommand Connect');
+                  end;
+                end;
+              1:
+                begin
+                if ClientServerPlugin <> nil then
+                  begin
+                  ClientServerPlugin.ExecuteCommand('ShowForm', '');
+      //            Memo2.Lines.Add('ExecuteCommand ShowForm');
+                  end;
+                end;
+              end;
+            end;
+          if ClientServerPlugin.PluginInfo.PluginName = 'File server' then
+            begin
+            //если выделен плагин типа TDChatTestPlugin, то у него есть
+            //функция TestFunction1, TestFunction2
+            if ClientServerPlugin <> nil then
+              begin
+              ClientServerPlugin.ExecuteCommand('ShowForm', '');
+      //        Memo2.Lines.Add('ExecuteCommand ShowForm');
+              end;
+      //      Memo2.Lines.Add('MenuItem2');
+            end;
+          end;
+        end;
+      end
+    else
+      //баженов
+    sMessageDlg(inttostr(TMenuItem(Sender).tag), 'OnMenuClick ', mtInformation, [mbOk], 0);
+    end;
+  end;
+end;
+
+procedure TDynamicVTHPopupMenu.OnAdvancedDrawItem(Sender: TObject; ACanvas: TCanvas;
+  ARect: TRect; State: TOwnerDrawState);
+//var DC: hDC;
+    //Point: TPoint;
+    //Window: TWinControl;
+begin
+{Bitmap.Height := Component.Height;
+Bitmap.Width := Component.Width;
+DC := GetDC(Component.Handle);
+bitblt(Bitmap.Canvas.Handle, 0, 0, Component.Width, Component.Height,
+       DC, 0, 0, SRCCOPY);}
+
+if ACanvas.ClipRect.Right > FormUI.Width then
+  begin
+  //если ширина Формы с инфой пользователя меньше, чем ширина меню
+  //увеличиваем размер формы, до размера меню
+  FormUI.Width := ACanvas.ClipRect.Right + 11;
+  FormUI.Repaint;
+  Bitmap.Height := FormUI.UserInfoChatView.Height;
+  Bitmap.Width := FormUI.UserInfoChatView.Width;
+  FormUI.UserInfoChatView.PaintTo(Bitmap.Canvas.Handle, 0, 0);
+  end;
+ACanvas.Draw(ARect.Left, ARect.Top, Bitmap);
+
+//Edit1.ParentWindow := VTHeaderPopupMenu1.WindowHandle;
+{Point.x := 20;//ARect.Left;
+Point.y := 20;//ARect.Top;
+Window := FindVCLWindow(Point);
+FormMain.Caption := inttostr(ARect.Left);}
+
+//никак не хочет((
+//Window := FindControl(VTHeaderPopupMenu1.WindowHandle);
+{Window := FindControl(VTHeaderPopupMenu1.Items.WindowHandle);
+//Window := FindControl(ChatView1.Handle);//FindVCLWindow(Point);
+if Window <> nil then
+  begin
+  MessageBox(0, PChar('1'), PChar(inttostr(1)), mb_ok);
+  Edit1.Parent := Window;//(VTHeaderPopupMenu1);
+  Edit1.Top := 20;
+  Edit1.Left := 0;
+  end;}
+//Edit1.ParentWindow := ChatView1.Handle;
+//Edit1.Parent := ChatView1;
+end;
+
+procedure TDynamicVTHPopupMenu.OnMeasureItem(Sender: TObject; ACanvas: TCanvas;
+  var Width, Height: Integer);
+begin
+Width := FormUI.UserInfoChatView.Width - 11;
+Height := FormUI.UserInfoChatView.Height;
+end;
+
+{procedure TDynamicVTHPopupMenu.OnPopUp(Sender: TObject);override;
+begin
+MessageBox(0, PChar('OnPopUp'), PChar(inttostr(1)) ,mb_ok);
+inherited OnPopUp;
+if TComponent(Sender) is TsChatView then
+  begin
+  MenuItem := TMenuItem.Create(Self);
+  MenuItem.Caption := 'Это меню для';
+  Self.Items.Add(MenuItem);
+  MenuItem := TMenuItem.Create(Self);
+  MenuItem.Caption := 'TChatView';
+  Self.Items.Add(MenuItem);
+  end;
+end;}
+
+end.
+

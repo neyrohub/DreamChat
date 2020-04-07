@@ -1,0 +1,95 @@
+object CVStyle1: TCVStyle
+  TextStyles = <
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 10
+      Color = clWindowText
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 9
+      Color = clRed
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 8
+      Color = clGreen
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 8
+      Color = clBlack
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 8
+      Color = clGreen
+      Style = [fsUnderline]
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 8
+      Color = clAqua
+      Style = [fsUnderline]
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 8
+      Color = clRed
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 8
+      Color = clWindowText
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 12
+      Color = clBlue
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'Tahoma'
+      Size = 11
+      Color = clSilver
+      Style = []
+    end>
+  JumpCursor = 101
+  Color = clWindow
+  HoverColor = clNone
+  FullRedraw = False
+  SelColor = clNavy
+  SelTextColor = clHighlightText
+  Left = 493
+  Top = 1
+end
+
+//Очередность стилей в коллекции TextStyles:
+//NORMALTEXTSTYLE = 0;
+//SYSTEMTEXTSTYLE = 1;
+//PRIVATETEXTSTYLE = 2;
+//BOARDTEXTSTYLE = 3;
+//LINKTEXTSTYLE = 4;
+//ONLINKTEXTSTYLE = 5;
+//INFONAMESTYLE = 6;
+//INFOTEXTSTYLE = 7;
+//METEXTSTYLE = 8;
+//USEROFFLINENICKSTYLE = 9;
+//Возможные значения:
+//Style = [fsBold, fsUnderline, fsItalic];

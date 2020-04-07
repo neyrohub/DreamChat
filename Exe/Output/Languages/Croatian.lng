@@ -1,0 +1,182 @@
+[Common]
+KeyboardLayout=00000409
+Name=Croatian
+
+[ErrorStrings]
+10=Greška
+11=U izvoðenju
+12=Zadatak neuspješan i izbrisan.
+
+[Strings]
+10=Glavna soba
+11=Privatna soba
+12=Redak
+13=Oglasna ploæa
+14=
+15=Korisnik spojen
+16=Korisnik odspojen
+17=Korisnik ne odgovara
+18=Privatno sa
+19=Korisnik je preimenovan
+//[Form]
+20=Zatvori
+21=Osvježi
+22=Spremi debug dnevnik
+23=Privatna poruka za
+24=Privatna poruka svima
+25=Kreiraj redak
+26=Ignoriraj sve
+27=Korisnièki podaci
+28=Pridruži se privatnom razgovoru
+29=Pridruži se u redak
+//[UserInfo]
+30=Prikaži nadimak:
+31=Nadimak:
+32=IP:
+33=naziv raèunala:
+34=Prijava:
+35=Verzija chat-a:
+36=CommDll verzija:
+37=Status:
+//[NewLine]
+38=Unesi lozinku
+39=Pridruži se
+40=Unesi lozinku i ime retka
+41=Kreiraj
+42=Novi redak
+43=Poništi
+44=Naziv retka
+45=Lozinka
+//[MainPopUpMenu]
+46=Izlaz
+47=Pogledaj djeljene mape \\
+48=Napiši nadimak
+
+[ExceptDictWords]
+ExceptSymbols=,.[]
+
+[EngToLocale]
+http://www.=http://www.
+http:\\=http://
+http://=http://
+/nickname=/nickname
+/chat=/chat
+file://=file:\\
+file:\\=file:\\
+file=file
+/msg=/msg
+
+[LocaleToEng]
+http://www.=http://www.
+http:\\=http://
+http://=http://
+file://=file:\\
+file:\\=file:\\
+/nickname=/nickname
+/chat=/chat
+file=file
+/msg=/msg
+
+[Hints]
+ClearBtn=Clear message window
+RefreshBBtn=Refresh list of users
+Status0Btn=Go to "Normal" mode
+Status1Btn=Go to "Don't disturb on MASS messages" mode
+Status2Btn=Go to "Don't disturb on all messages" mode
+Status3Btn=Go to "I'm away" mode
+SmileBtn=Open smiles list...
+DebugBtn=Open debug window...
+SettingsBtn=Open settings dialog...
+AboutBtn=About...
+
+[Settings]
+dc=Dream Chat
+n=Nickname:
+nnm=NoNaMe
+NoAvailabS=There is no accessible skins.
+NoSkin=Without skin
+NoC=Can not create a folder 
+Nm=New message:
+Vm=Enter a message:
+M0=Hi to all!
+M1=Busy!
+M2=Do not disturb!
+M3=Went away!
+lUsers=User:
+Default=Default settings
+Path=Sound file:
+FSettings=Options
+bAcept=Apply
+bCancel=Cancel
+bOk=OK
+eMess=Message text
+lBoard=Message on message board
+lInfoName=Information, Title
+lInfoText=Information, Text
+lLink=Link
+lMeText=Report about itself
+lNormal=Received message
+lOnLink=Pressed link
+lPrivat=Private message
+lSystem=System message
+tUsers_Item0=Alex
+tUsers_Item1=New line
+lFonts=Fonts:
+gSkin=Skin:
+cbSkin_BoundLabel=Fonts:
+eSkinPath_BoundLabel=Folder with skins:
+lColor=Skin color:
+lLangSkin=Skin and Language:
+gbBoard=Message board:
+bbEdBoard=Edit
+feMesBoard_BoundLabel=File:
+gReceived=Confirmation of delivery:
+lMess=Messages:
+tcAutoM_Tabs0=Connect message:
+tcAutoM_Tabs1=Mode "Don't disturb on MASS messages":
+tcAutoM_Tabs2=Mode "Don't disturb on all messages":
+tcAutoM_Tabs3=Mode "I'm away":
+bbAdd=Add
+bbDel=Delete
+bbDown=Down
+bbEdit=Edit
+bbUp=Up
+PopupMenu1_Items0=Add
+PopupMenu1_Items1=Edit
+PopupMenu1_Items2=Delete
+gProtocols=Compatibility:
+cProto=Compatibility with the version of "Antikhak" 1.3b8
+gServer=Dedicated server:
+eIPAdr_BoundLabel=IP-address:
+ePortNamb_BoundLabel=Port:
+gSoedinenie=Connect using:
+rMailSlots=MailSlots
+rVidelServ=Dedicated server
+lPodkl=Connection:
+pNameSel=Nickname:
+rFromLogon=Name from Windows login
+rFromName=Computer name
+rName=Name from a list:
+gbUserFonts=Fonts:
+lNick=Nickname
+lMouseOver=Pressed nickname
+gbSounds=Sounds:
+fbSounds_Item0=Private message has been arrived
+fbSounds_Item1=Mass private message has been arrived
+fbSounds_Item2=Message board has been updated
+fbSounds_Item3=Message has been arrived
+fbSounds_Item4=User has connected
+fbSounds_Item5=User has disconnected
+fbSounds_Item6=User has renamed
+fbSounds_Item7=User has changed status
+fbSounds_Item8=Line has been created
+fbSounds_Item9=Line has been entered
+fbSounds_Item10=Message has been delivered
+fbSounds_Item11=REFRESH request has been arrived
+tPanelSel_Item0=Connection
+tPanelSel_Item1=Common
+tPanelSel_Item2=Fonts
+tPanelSel_Item3=Skin and Language
+tPanelSel_Item4=Messages
+tPanelSel_Item5=Users
+gbLanguage=Language:

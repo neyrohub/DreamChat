@@ -1,0 +1,46 @@
+object CVStyle: TCVStyle
+  TextStyles = <
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'MS Reference Sans Serif'
+      Size = 8
+      Color = clWindowText
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'MS Reference Sans Serif'
+      Size = 8
+      Color = clRed
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'MS Reference Sans Serif'
+      Size = 10
+      Color = clBlack
+      Style = [fsBold]
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'MS Reference Sans Serif'
+      Size = 8
+      Color = clGreen
+      Style = []
+    end
+    item
+      CharSet = RUSSIAN_CHARSET
+      FontName = 'MS Reference Sans Serif'
+      Size = 8
+      Color = clBlue
+      Style = []
+    end>
+  JumpCursor = 101
+  Color = clWindow
+  HoverColor = clNone
+  FullRedraw = False
+  SelColor = clNavy
+  SelTextColor = clHighlightText
+  Left = 493
+  Top = 1
+end

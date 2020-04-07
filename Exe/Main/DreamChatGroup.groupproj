@@ -1,0 +1,34 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{5a9fcbb8-349c-4d30-869a-a98c531836fb}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="DreamChat.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="DreamChat">
+    <MSBuild Projects="DreamChat.dproj" Targets="" />
+  </Target>
+  <Target Name="DreamChat:Clean">
+    <MSBuild Projects="DreamChat.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="DreamChat:Make">
+    <MSBuild Projects="DreamChat.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="DreamChat" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="DreamChat:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="DreamChat:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

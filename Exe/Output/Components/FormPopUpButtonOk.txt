@@ -1,0 +1,8 @@
+object Button1: TsButton
+  Left = 32
+  Top = 16
+  Width = 89
+  Height = 33
+  Caption = 'OK'
+  TabOrder = 0
+end

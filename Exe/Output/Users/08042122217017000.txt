@@ -1,0 +1,36 @@
+[TChatUser]
+ComputerName=192.168.1.4/ANDREY/Admins
+CheckNodeStates=0
+Ignored=0
+
+[Sound]
+Disconnect=\sound\robotzwi.wav
+Text=\sound\MsgType.wav
+Connect=\sound\notify.wav
+Alert=\sound\robotzde.wav
+AlertToAll=\sound\plugin.wav
+Received=
+Status=
+Board=\sound\robotzas.wav
+Refresh=
+Rename=\sound\chimes.wav
+Create=\sound\robotz~1.wav
+FindLine=\sound\Notify2.wav
+
+[UserOnLineFS]
+CharSet=DEFAULT_CHARSET
+FontName='MS Sans Serif'
+Size=11
+Color=clGreen
+Style=[]
+
+[UserOnLineMouseOverFS]
+CharSet=ANSI_CHARSET
+FontName='Arial'
+Size=10
+Color=clWindowText
+Style=[]
+
+[UserNickNames]
+A n d r e y
+

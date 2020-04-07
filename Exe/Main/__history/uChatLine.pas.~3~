@@ -1,0 +1,1863 @@
+unit uChatLine;
+
+//сделать надежнее процедуру уникальности имени!
+//Осторожно при переделки отрисовки дерева! При обработке команды 'CONNECT'
+//если отрисовываем все дерево, вызать form1.ShowAllUserInTree(self);
+//в модуле UChatLine вообще не надо!!!! более того опасно!!!
+//Если потом буду переделывать, то отдельно вызывать отрисовку после создания
+//юзера и после создания LineNode!!!!
+
+interface
+
+uses
+     Classes, Controls, ComCtrls, Forms, ExtCtrls, SysUtils, Windows,
+     Graphics, uFormDebug, CVLiteGifAniX2, Inifiles, litegifX2,
+     ChatView, sChatView, cvStyle,  WinSock, JwaIpHlpApi, JwaIpRtrMib,
+     uChatUser,
+     VirtualTrees, UGifVirtualStringTree,
+     sPageControl, sSplitter
+     {$IFDEF USELOG4D}, log4d {$ENDIF USELOG4D}
+     , DreamChatConsts
+     ;
+
+const
+  UNKNOWN_LOG_FILE_NAME = 'Unknown_line_name';
+  INVALID_USER_ID = CARDINAL($FFFFFFFF);
+//  LINE_TYPE_COMMON = 0;
+//  LINE_TYPE_PRIVATE_CHAT = 1;
+//  LINE_TYPE_COMMON_LINE = 2;
+
+type
+TLineType = (LT_COMMON, LT_PRIVATE_CHAT, LT_LINE);
+
+type
+  TChatLine = class;
+
+  TOnCmdConnect = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdDisconnect = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdText = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdRefresh = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdReceived = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdReName = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdBoard = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal;DoUpdate:Boolean) of object;
+  TOnCmdStatus = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdStatus_Req = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdRefresh_Board = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdCREATE = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+  TOnCmdCREATELINE = procedure (Sender: TChatLine; var IncommingMessage: String; UserID:cardinal) of object;
+
+
+  TChatLine = class (TPersistent)
+  private
+    //Show_SystemMessages_Refresh :boolean;
+    FChatLineName 		 :String;//название линии
+    FChatLineTabSheet  :TsTabSheet;//закладка для размещения [Общий] и [Дерева]
+    FChatLineView		   :TsChatView;//компонент для вывода [Общий]
+    FChatLineTree		   :TGifVirtualStringTree;//компонент для вывода списка пользователей
+    FChatSplitter      :TsSplitter;//разделитель [Общий] и [Дерева]
+    FMessagesHistory   :TStringList;//история твоих сообщений (TEdit1.OnKeyDown)
+    FAutoRefreshTime   :integer;//время автообновления списка юзеров
+//    FUsersCount        :cardinal;//количество пользователей
+    FOnCmdConnect      :TOnCmdConnect;//генерим событие на команду 'Connect'
+    FOnCmdDisconnect   :TOnCmdDisconnect;//генерим событие на команду 'Disconnect'
+    FOnCmdText         :TOnCmdText;//генерим событие на команду 'Text'
+    FOnCmdRefresh      :TOnCmdRefresh;//генерим событие на команду 'Rerfresh'
+    FOnCmdReceived     :TOnCmdReceived;//генерим событие на команду 'Received'
+    FOnCmdBoard        :TOnCmdBoard;//генерим событие на команду 'Board'
+    FOnCmdStatus       :TOnCmdStatus;//генерим событие на команду 'Status'
+    FOnCmdStatus_Req   :TOnCmdStatus_Req;//генерим событие на команду 'Status_Req'
+    FOnCmdRefresh_Board:TOnCmdRefresh_Board;//генерим событие на команду 'Refresh_Board'
+    FOnCmdRename       :TOnCmdRename;//генерим событие на команду 'Rerfresh'
+    FOnCmdCreate       :TOnCmdCreate;//генерим событие на команду 'Rerfresh'
+    FOnCmdCreateLine   :TOnCmdCreateLine;//генерим событие на команду 'Rerfresh'
+    TimerSendMsgRefresh:TTimer;
+
+    {/для отрисовки дерева}
+    FUNCTION GetSafetyLogFileName(FileNameWithExceptSymbols: string):string;
+  protected
+    {для отрисовки дерева}
+    {/для отрисовки дерева}
+    PROCEDURE ChatLineViewMouseDown(Sender: TObject; Button: TMouseButton;
+              Shift: TShiftState; X, Y: Integer);
+    PROCEDURE OnVScrolled(Sender: TObject);
+    PROCEDURE ChatSplitterCanResize(Sender: TObject; var NewSize: Integer;
+              var Accept: Boolean);
+    PROCEDURE SetAutoRefreshTime(RefreshTime: integer);
+    function GetUsersCount():cardinal;
+    function GetLocalComputerName():string;//здесь потом проверять win = 98/NT !!!!!!!!!
+    procedure StringToComponent(Component: TComponent; Value: string);
+  public
+    UsersConnectHistory                 :TStringlist;//Тут будут хнариться указатели на стиль OffLine для каждего юзера.
+    LineID                              :cardinal;//совпадает с PageIndex
+    LineType             		            :TLineType;//системное название линии
+    DisplayChatLineName 	              :String;//пользовательское название линии
+//    SmilesName                          :TStringlist;
+    FFullLogFileName                    :string;//имя файла лога без /^* и прочих системных символов
+    LineLog                             :TStringlist;//Лог всех сообщений этой линии
+    ChatLineUsers     		              :array of TChatUser;//юзеры которые в этой линии чата
+    Key                                 :string;
+    LocalIpAddres                       :string;
+    LocalComputerName                   :string;
+    LocalLoginName                      :string;
+    ScrollToEnd                         :boolean;
+    MessagesHistoryIndex                :integer;
+    RefreshTreeNumber                   :Cardinal;
+    property AutoRefreshTime            :integer read FAutoRefreshTime write SetAutoRefreshTime;//время автообновления списка юзеров
+    property ChatLineName 	    :String read FChatLineName write FChatLineName;
+    property ChatLineTabSheet   :TsTabSheet read FChatLineTabSheet write FChatLineTabSheet;
+    property ChatLineView		    :TsChatView read FChatLineView write FChatLineView;
+    property ChatLineTree		    :TGifVirtualStringTree read FChatLineTree write FChatLineTree;
+    property ChatSplitter		    :TsSplitter read FChatSplitter write FChatSplitter;
+    property MessagesHistory	  :TStringList read FMessagesHistory write FMessagesHistory;
+    property UsersCount		      :cardinal read GetUsersCount;// write FUsersCount;
+    property OnCmdConnect	      :TOnCmdConnect read FOnCmdConnect write FOnCmdConnect;
+    property OnCmdDisconnect	  :TOnCmdDisconnect read FOnCmdDisconnect write FOnCmdDisconnect;
+    property OnCmdText		      :TOnCmdText read FOnCmdText write FOnCmdText;
+    property OnCmdRefresh		    :TOnCmdRefresh read FOnCmdRefresh write FOnCmdRefresh;
+    property OnCmdReceived		  :TOnCmdReceived read FOnCmdReceived write FOnCmdReceived;
+    property OnCmdRename		    :TOnCmdRename read FOnCmdRename write FOnCmdRename;
+    property OnCmdCreate		    :TOnCmdCreate read FOnCmdCreate write FOnCmdCreate;
+    property OnCmdCreateLine	  :TOnCmdCreateLine read FOnCmdCreateLine write FOnCmdCreateLine;
+    property OnCmdBoard		      :TOnCmdBoard read FOnCmdBoard write FOnCmdBoard;
+    property OnCmdStatus		    :TOnCmdStatus read FOnCmdStatus write FOnCmdStatus;
+    property OnCmdStatus_Req	  :TOnCmdStatus_Req read FOnCmdStatus_Req write FOnCmdStatus_Req;
+    property OnCmdRefresh_Board :TOnCmdRefresh_Board read FOnCmdRefresh_Board write FOnCmdRefresh_Board;
+
+//    FUNCTION GetLocalUserLoginName():string;//здесь потом проверять win = 98/NT !!!!!!!!!
+    FUNCTION GetUniqueNickName(NewUserId: cardinal):string;
+    //roma FUNCTION GetParamX(SourceString: String; ParamNumber: Integer; Separator: String; HideSingleSeparaterError:boolean): String;
+    function GetUserIdByCompName(CompName:String):cardinal;
+    function GetUserIdByDisplayNickName(DisplayNickName:String):cardinal;//ДОБАВИТЬ IP !!!
+    function GetUserInfo(UserNumber:cardinal):TChatUser;
+    function GetUserByDisplayNickName(DisplayNickName:String):TChatUser;//ДОБАВИТЬ IP !!!
+    function GetLocalUserId():cardinal;
+    function GetLocalUser():TChatUser;
+    PROCEDURE Scheduler(Sender: TObject);
+    procedure SendDisconnectConnect(sReceivedMessage:string);
+    procedure MessageProtocolProcessing(pReceivedMessage: PChar);//сюда толкаем полученную из DLL строку
+    procedure Assign(Source: TPersistent);override;{virtual;}
+    //function StrToIntE(s: string):integer;
+  published
+    constructor Create(LineName:String;ChatPageControl:TPageControl;CVStyle:TCVStyle);
+    destructor Destroy;override;
+  end;
+
+  PChatLine = ^TChatLine;
+
+implementation
+
+uses uFormMain, uLineNode, DreamChatTools, DreamChatConfig, uPathBuilder;
+
+PROCEDURE TChatLine.Scheduler(Sender: TObject);
+VAR tLocalUser: TChatUser;
+    n:cardinal;
+    Mess:string;
+{$IFDEF USELOG4D}
+    logger: TLogLogger;
+{$ENDIF USELOG4D}
+BEGIN
+
+try
+  tLocalUser := Self.GetUserInfo(Self.GetLocalUserID);
+
+  if tLocalUser <> nil then begin
+{$IFDEF USELOG4D}
+    if Self.UsersCount = 0 then begin
+      logger := TLogLogger.GetLogger(DREAMCHATLOGGER_NAME);
+      logger.Error('[TChatLine.Scheduler] Weird, Self.UsersCount = 0 (!)');
+    end;
+{$ENDIF USELOG4D}
+
+    //for n := 0 to Self.UsersCount - 1 do begin
+    n := 0;
+    while n < self.UsersCount do begin
+      if (tLocalUser.UserID <> Self.ChatLineUsers[n].UserID) and
+         (Self.ChatLineUsers[n].Status = dcsDisconnected) then
+      begin
+        if TDreamChatConfig.GetRefreshMessage = True //Show_SystemMessages_Refresh = True
+          then FormMain.ParseAllChatView(ChatLineUsers[n].DisplayNickName + ' ' + fmInternational.Strings[I_NOTANSWERING],
+                             self, FormMain.CVStyle1.TextStyles.Items[SYSTEMTEXTSTYLE],
+                             nil, nil, false, true)
+        else
+          TDebugMan.AddLine2(ChatLineUsers[n].DisplayNickName + ' ' + fmInternational.Strings[I_NOTANSWERING]); //FormDebug.DebugMemo2.Lines.Add(ChatLineUsers[n].DisplayNickName + ' ' + fmInternational.Strings[I_NOTANSWERING]);
+         //делаем так как буд-то пришло сообщение DISCONNECT от этого юзера
+         // iChat  1  ANDREY  DISCONNECT  iTCniaM 
+         Mess := #19 + ChatLineUsers[n].ProtoName + #19#19 + inttostr(ChatLineUsers[n].LastReceivedMessNumber + 1) +
+                 #19#19 + ChatLineUsers[n].ComputerName +  #19#19 + 'DISCONNECT' +  #19#19 +
+                 self.FChatLineName + #19;
+         // если удаляем юзера из списка то n не увеличиваем
+         MessageProtocolProcessing(PChar(Mess));
+         TDebugMan.AddLine2('Юзер не отвечает, удаляем его из линии [' + self.ChatLineName + '] <<<< ' + Mess); //FormDebug.DebugMemo2.Lines.Add('Юзер не отвечает, удаляем его из линии [' + self.ChatLineName + '] <<<< ' + Mess);
+         {SendCommDisconnect(PChar(ChatLineUsers[n].ProtoName),
+                         PChar(ChatLineUsers[n].ComputerName),
+                         PChar(tLocalUser.ComputerName),
+                         PChar(self.FChatLineName));}
+      end
+      else
+      begin
+        inc(n); // увеличиваем n только если не удаляли юзера
+      end;
+    end;
+
+    for n := 0 to Self.UsersCount - 1 do begin
+      if tLocalUser.UserID <> Self.ChatLineUsers[n].UserID then begin
+        Self.ChatLineUsers[n].Status := dcsDisconnected;
+  //    SendCommStatus(PChar(MainLine.ChatLineUsers[n].ComputerName), tLocalUser.Status, PChar(tLocalUser.MessageStatus.Strings[tLocalUser.Status]));
+
+        if ChatMode <> cmodTCP
+          then SendCommRefresh(PChar(Self.ChatLineUsers[n].ProtoName), PChar(Self.ChatLineUsers[n].ComputerName), PChar(Self.ChatLineName), PChar(Self.ChatLineUsers[n].DisplayNickName), Ord(tLocalUser.Status), PChar(tLocalUser.MessageStatus.Strings[Ord(tLocalUser.Status)]), '*', 0);
+
+        SendCommRefresh(PChar(Self.ChatLineUsers[n].ProtoName), PChar(Self.ChatLineUsers[n].ComputerName), PChar(Self.ChatLineName), PChar(Self.ChatLineUsers[n].DisplayNickName), Ord(tLocalUser.Status), PChar(tLocalUser.MessageStatus.Strings[Ord(tLocalUser.Status)]), '*', 1);
+      end;
+    end;
+  end;
+
+  SendMessage(application.MainForm.handle,
+              UM_INCOMMINGMESSAGE,
+              UM_INCOMMINGMESSAGE_UpdateTree, Self.LineID);
+
+  TimerSendMsgRefresh.Interval := Self.AutoRefreshTime; // TODO ????? why is it?
+
+except
+  on E: Exception do begin
+{$IFDEF USELOG4D}
+    logger := TLogLogger.GetLogger(DREAMCHATLOGGER_NAME);
+    logger.Error(E.Message, E);
+{$ENDIF USELOG4D}
+    raise;
+  end;
+end;
+
+END;
+
+procedure TChatLine.ChatLineViewMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  p: TPoint;
+begin
+//form1.Caption := 'x = ' + inttostr(x) + ' y = ' + inttostr(y);
+if Button = mbRight then
+  begin
+  p.X := X;
+  p.Y := Y;
+  p := (Sender as TControl).ClientToScreen(p);
+  DynamicPopupMenu.OnComponentClick(TComponent(Sender), p.X, p.Y {MouseX, MouseY});
+  end;
+end;
+
+{roma
+FUNCTION TChatLine.GetParamX(SourceString: String; ParamNumber: Integer; Separator: String; HideSingleSeparaterError:boolean): String;
+VAR
+I, Posit, DelCount: integer;
+S: string;
+BEGIN
+S := SourceString;
+for I := 1 to ParamNumber do begin
+  Posit := Pos(Separator, S) + Length(Separator) - 1;
+  Delete(S, 1, Posit);
+end;
+Posit := Pos(Separator, S);
+DelCount := Length(S) - Posit + 1;
+Delete(S, Posit, DelCount);
+if HideSingleSeparaterError = true then
+  begin
+  i := Pos(Separator[1], s);
+  while i > 0 do
+    begin
+    delete(s, i, 1);
+    i := Pos(Separator[1], s);
+    end;
+  end;
+Result := s;
+END;
+}
+
+PROCEDURE TChatLine.SetAutoRefreshTime(RefreshTime: integer);
+BEGIN
+self.TimerSendMsgRefresh.Interval := RefreshTime;
+self.FAutoRefreshTime := RefreshTime;
+END;
+
+FUNCTION TChatLine.GetUniqueNickName(NewUserId: cardinal):string;
+VAR c, LocalUserId:cardinal;
+BEGIN
+//выясняем нет ли в чате юзера с таким же ником, как у вошедшего
+result := Self.ChatLineUsers[NewUserId].NickName;
+LocalUserId := Self.GetLocalUserId();
+if GetLocalUserId = INVALID_USER_ID then
+  begin
+  TDebugMan.AddLine2('[' + self.ChatLineName + '].GetUniqueNickName(): Локального юзера нет в этой линии!'); //FormDebug.DebugMemo2.Lines.Add('[' + self.ChatLineName + '].GetUniqueNickName(): Локального юзера нет в этой линии!');
+  exit;
+  end;
+
+for c := 0 to Self.UsersCount - 1 do
+  begin
+  if (c <> LocalUserId) and (NewUserId = LocalUserId) and
+    (AnsiCompareText(Self.ChatLineUsers[c].NickName, Self.ChatLineUsers[LocalUserId].NickName) = 0) then
+    begin
+    //в чат входит локальный пользователь, но его ник совпадает
+    //с ником другого юзера отображаем его ник по-другому
+    //добавляем к нику _IP_Login
+    if ChatMode = cmodTCP then
+      Self.ChatLineUsers[c].DisplayNickName :=  Self.ChatLineUsers[c].NickName + '_' + Self.ChatLineUsers[c].IP + '_' + Self.ChatLineUsers[c].Login
+    else
+      Self.ChatLineUsers[c].DisplayNickName :=  Self.ChatLineUsers[c].NickName + '_' + Self.ChatLineUsers[c].ComputerName + '_' + Self.ChatLineUsers[c].Login;
+
+    TDebugMan.AddLine2('[' + self.ChatLineName + ']: ник юзера [' + Self.ChatLineUsers[c].ComputerName + '] совпадает с ником локального юзера!'); //FormDebug.DebugMemo2.Lines.Add('[' + self.ChatLineName + ']: ник юзера [' + Self.ChatLineUsers[c].ComputerName + '] совпадает с ником локального юзера!');
+    TDebugMan.AddLine2('[' + self.ChatLineName + ']: меняем ник юзера [' + Self.ChatLineUsers[c].ComputerName + '] на ' + Self.ChatLineUsers[c].DisplayNickName); //FormDebug.DebugMemo2.Lines.Add('[' + self.ChatLineName + ']: меняем ник юзера [' + Self.ChatLineUsers[c].ComputerName + '] на ' + Self.ChatLineUsers[c].DisplayNickName);
+    break;
+    end;
+
+  if (NewUserId <> LocalUserId) and (NewUserId <> c) and
+   (AnsiCompareText(Self.ChatLineUsers[NewUserId].NickName, Self.ChatLineUsers[c].DisplayNickName) = 0) then
+    begin
+    //если ник вошедшего совпадает с ником кого-то в чате отображаем его ник по-другому
+    //MessageBox(0, PChar('Match!!!!'), PChar(inttostr(0)) ,mb_ok);
+    if ChatMode = cmodTCP then
+      Result :=  Self.ChatLineUsers[NewUserId].NickName + '_' + Self.ChatLineUsers[NewUserId].IP + '_' + Self.ChatLineUsers[NewUserId].Login
+    else
+      Result :=  Self.ChatLineUsers[NewUserId].NickName + '_' + Self.ChatLineUsers[NewUserId].ComputerName + '_' + Self.ChatLineUsers[NewUserId].Login;
+
+    TDebugMan.AddLine2('[' + self.ChatLineName + ']: 2 одинаковых ника! Существующий [' + Self.ChatLineUsers[c].ComputerName + '] ' + Self.ChatLineUsers[c].DisplayNickName +
+                              ' и пришедший [' + Self.ChatLineUsers[NewUserId].ComputerName + '] ' + Self.ChatLineUsers[NewUserId].NickName);
+                              //FormDebug.DebugMemo2.Lines.Add('[' + self.ChatLineName + ']: 2 одинаковых ника! Существующий [' + Self.ChatLineUsers[c].ComputerName + '] ' + Self.ChatLineUsers[c].DisplayNickName +
+                              //' и пришедший [' + Self.ChatLineUsers[NewUserId].ComputerName + '] ' + Self.ChatLineUsers[NewUserId].NickName);
+    TDebugMan.AddLine2('[' + self.ChatLineName + ']: Меняем ник [' + Self.ChatLineUsers[NewUserId].ComputerName + '] ' + Self.ChatLineUsers[NewUserId].NickName + ' на ' + Result); //FormDebug.DebugMemo2.Lines.Add('[' + self.ChatLineName + ']: Меняем ник [' + Self.ChatLineUsers[NewUserId].ComputerName + '] ' + Self.ChatLineUsers[NewUserId].NickName + ' на ' + Result);
+    break;
+    end;
+  end;
+END;
+
+FUNCTION TChatLine.GetUserByDisplayNickName(DisplayNickName:String):TChatUser;
+BEGIN
+  Result := self.GetUserInfo(self.GetUserIdByDisplayNickName(DisplayNickName));
+END;
+
+FUNCTION TChatLine.GetLocalUserId():cardinal;
+BEGIN
+  Result := self.GetUserIdByCompName(LocalComputerName);
+END;
+
+FUNCTION TChatLine.GetLocalUser():TChatUser;
+BEGIN
+  Result := self.GetUserInfo(self.GetLocalUserID());
+END;
+
+function TChatLine.GetUsersCount():cardinal;
+begin
+  Result := Length(self.ChatLineUsers);
+end;
+
+function TChatLine.GetUserInfo(UserNumber: cardinal):TChatUser;
+begin
+if (GetUsersCount() > 0) and (UserNumber <= (GetUsersCount() - 1)) then
+  begin
+  Result := self.ChatLineUsers[UserNumber];
+  end
+else
+  Result := nil;
+end;
+
+function TChatLine.GetUserIdByCompName(CompName: String):cardinal;
+var c:cardinal;
+begin
+Result := INVALID_USER_ID;
+if (length(Self.ChatLineUsers) > 0) and (Self.UsersCount > 0) {and (Length(ChatLineUsers) > 0)} then
+  begin
+  for c := 0 to Self.UsersCount - 1 do
+    begin
+    if AnsiCompareText(CompName, Self.ChatLineUsers[c].ComputerName) = 0 then
+      begin
+      Result := Self.ChatLineUsers[c].UserID;
+      break;
+      end;
+    end;
+  end;
+end;
+
+function TChatLine.GetUserIdByDisplayNickName(DisplayNickName: String):cardinal;
+var c:cardinal;
+begin
+result := INVALID_USER_ID;
+for c := 0 to UsersCount - 1 do
+  begin
+  if (Self <> nil) and (Self.ChatLineUsers[c] <> nil) and
+     (DisplayNickName = Self.ChatLineUsers[c].DisplayNickName) then
+    begin
+    result := Self.ChatLineUsers[c].UserID;
+    end;
+  end;
+end;
+
+function TChatLine.GetLocalComputerName():string;//здесь потом проверять win = 98/NT !!!!!!!!!
+var TempBuffer:array[0..255] of Char;
+    BufferSize:cardinal;
+begin
+BufferSize := SizeOf(TempBuffer);
+GetComputerName(@TempBuffer, BufferSize);
+self.LocalComputerName := strpas(StrUpper(TempBuffer));
+
+if Length(LocalComputerName) > 0 then
+  begin
+  result := LocalComputerName;
+  end
+else
+  result := 'ErrorGetLocalComputerName';
+end;
+
+
+{//эта ф-ция вынесена из класса в DLL, т.к. ее нужно вызывать из DreamChat.dpr
+
+function TChatLine.GetLocalUserLoginName():string;//здесь потом проверять win = 98/NT !!!!!!!!!
+var TempBuffer:array[0..255] of Char;
+    BufferSize:cardinal;
+    lpUserName:PChar;
+begin
+BufferSize := SizeOf(TempBuffer);
+lpUserName := @TempBuffer;
+if WNetGetUser(nil, lpUserName, BufferSize) = NO_ERROR then
+  begin
+  result := lpUserName;
+  end
+else
+  result := 'ErrorGetLocalUserLoginName'; //ВЕРНУТЬСЯ И ДОДЕЛАТЬ!!!
+end;}
+
+procedure TChatLine.SendDisconnectConnect(sReceivedMessage:string);
+var tLocalUser: TChatUser;
+    LineName, sProtoName: string;
+    MainLine: TChatLine;
+    {$IFDEF USELOG4D}
+    logger: TLogLogger;
+    {$ENDIF USELOG4D}
+    ComputerName: string;
+begin
+    {$IFDEF USELOG4D}
+    logger := TLogLogger.GetLogger(DREAMCHATLOGGER_NAME);
+    {$ENDIF USELOG4D}
+
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+    TDebugMan.AddLine2('Внимание! Пришло сообщение ' +
+                          PChar(GetParamX(sReceivedMessage, 3, #19#19, true)) + ' от ' +
+                          PChar(GetParamX(sReceivedMessage, 2, #19#19, true)) +
+                          ' но в чате его нет!');
+    //FormDebug.DebugMemo2.Lines.Add('Внимание! Пришло сообщение ' +
+    //                      PChar(GetParamX(sReceivedMessage, 3, #19#19, true)) + ' от ' +
+    //                      PChar(GetParamX(sReceivedMessage, 2, #19#19, true)) +
+    //                      ' но в чате его нет!');
+    TDebugMan.AddLine2('Посылаем ему DISCONNECT + CONNECT...'); //FormDebug.DebugMemo2.Lines.Add('Посылаем ему DISCONNECT + CONNECT...');
+    //SendCommDisconnect(PChar(GetParamX(sReceivedMessage, 1, #19, true)), '', PChar(GetParamX(sReceivedMessage, 2, #19#19, true)), 'iTCniaM');
+    //LineName := Pchar(GetParamX(sReceivedMessage, 4, #19#19, true));
+    LineName := self.FChatLineName;
+    SendCommDisconnect(@(FormMain.FSettings.eCryptoKey.Text[1]), Length(FormMain.FSettings.eCryptoKey.Text[1]),
+                       PChar(GetParamX(sReceivedMessage, 1, #19, True)), '',
+                       PChar(GetParamX(sReceivedMessage, 2, #19#19, True)), PChar(LineName));
+    tLocalUser := FormMain.GetMainLine.GetLocalUser ;//self.GetUserInfo(self.GetLocalUserID());
+
+    {$IFDEF USELOG4D}
+    if tLocalUser = nil
+      then logger.error('[TChatLine.SendDisconnectConnect] tLocalUser = NULL!');
+    {$ENDIF USELOG4D}
+
+    if LineName = '*'
+      then LineName := TDreamChatDefaults.MainChatLineName; //'iTCniaM';
+
+    sProtoName := GetParamX(sReceivedMessage, 1, #19, True);
+    ComputerName := GetParamX(sReceivedMessage, 2, #19#19, True);
+
+    SendCommConnect(PChar(sProtoName),
+                    PChar(LocalNickName),
+                    Pchar(ComputerName {GetParamX(sReceivedMessage, 2, #19#19, true)}),
+                    Pchar(LineName),// 'iTCniaM',
+                    Pchar(ComputerName {GetParamX(sReceivedMessage, 2, #19#19, true)}),
+                    PChar(tLocalUser.MessageStatus.Strings[Ord(tLocalUser.Status)]),
+                    Ord(tLocalUser.Status));
+
+    {$IFDEF USELOG4D}
+    logger.info('[TChatLine.SendDisconnectConnect] after SendCommConnect');
+    {$ENDIF USELOG4D}
+
+    MainLine := FormMain.GetMainLine;
+    tLocalUser := MainLine.GetLocalUser;
+    if tLocalUser <> nil then
+      begin
+      SendCommStatus_Req(PChar(tLocalUser.ProtoName), PChar(GetParamX(sReceivedMessage, 2, #19#19, True)));
+      SendCommRefresh_Board(PChar(tLocalUser.ProtoName), PChar(GetParamX(sReceivedMessage, 2, #19#19, True)), 1);
+      end;
+end;
+
+PROCEDURE TChatLine.OnVScrolled;
+BEGIN
+if self.ChatLineView.VScrollPos = self.ChatLineView.VScrollMax then
+  ScrollToEnd := true
+else
+  ScrollToEnd := false;
+END;
+
+procedure TChatLine.ChatSplitterCanResize(Sender: TObject; var NewSize: Integer;
+  var Accept: Boolean);
+begin
+if FChatSplitter.Align = FChatLineTree.Align then
+  begin
+  if (FChatLineTree.Constraints.MinWidth > 0) and
+    (NewSize < FChatLineTree.Constraints.MinWidth) then
+    Accept := false;
+  if (FChatLineTree.Constraints.MaxWidth > 0) and
+    (NewSize > FChatLineTree.Constraints.MaxWidth) then
+    Accept := false;
+  end;
+if FChatSplitter.Align = FChatLineView.Align then
+  begin
+  if (FChatLineView.Constraints.MinWidth > 0) and
+    (NewSize < FChatLineView.Constraints.MinWidth) then
+    Accept := false;
+  if (FChatLineView.Constraints.MaxWidth > 0) and
+   (NewSize > FChatLineView.Constraints.MaxWidth) then
+    Accept := false;
+  end;
+if FChatLineView.Align = alClient then
+  begin
+  if FChatLineView.Parent.Width - NewSize <= FChatLineView.Constraints.MinWidth + 5 then
+    Accept := false;
+  end;
+end;
+
+procedure TChatLine.StringToComponent(Component: TComponent; Value: string);
+var
+  StrStream:TStringStream;
+  ms: TMemoryStream;
+begin
+  StrStream := TStringStream.Create(Value);
+  try
+    ms := TMemoryStream.Create;
+    try
+      ObjectTextToBinary(StrStream, ms);
+      ms.position := 0;
+      ms.ReadComponent(Component);
+    finally
+      ms.Free;
+    end;
+  finally
+    StrStream.Free;
+  end;
+end;
+
+constructor TChatLine.Create(LineName:String; ChatPageControl:TPageControl; CVStyle:TCVStyle);
+var
+  strlist: TStringList;
+  si, sc: string;
+  LocalIP: PChar;
+begin
+  inherited Create;
+  {потом еще добавить проверку на создание линий с одинаковыми именами и т.д.}
+  self.ChatLineName := LineName;
+
+  //Show_SystemMessages_Refresh := TDreamChatConfig.GetRefreshMessage(); //FormMain.ChatConfig.ReadBool('SystemMessages', 'RefreshMessage', true);
+
+  //Тут будут хнариться указатели на стиль OffLine для каждего юзера.
+  //Когда юзер покидает чат, то все его фразы будут выводиться стилем
+  //который храниться в этом списке. Если юзер снова зашел в чат, то мы
+  //обновляем указатель на его персональный стиль.
+  UsersConnectHistory := TStringlist.Create;
+
+  MessagesHistory := TStringList.Create;
+  LineLog := TStringList.Create;
+  FFullLogFileName := GetSafetyLogFileName(LineName);
+  if FFullLogFileName = UNKNOWN_LOG_FILE_NAME then
+  begin
+    sc := LineLog.Text;
+    LineLog.Add(sc);
+  end;
+
+  FFullLogFileName := TPathBuilder.GetExePath() + 'Logs\' + FFullLogFileName + '.log';
+{if FileExists(FFullLogFileName) then
+  begin
+  LineLog.LoadFromFile(FFullLogFileName);
+  LineLog.Add(sc);
+  end;}
+  LineLog.Add('DreamChat runing at: [' + DateToStr(Now) + '/' + TimeToStr(Now) + ']');
+
+  self.LineType := LT_COMMON;
+  self.LineID := 0;
+  self.ScrollToEnd := true;
+  self.MessagesHistoryIndex := 0;
+  strlist := TStringList.Create;
+  si := TPathBuilder.GetExePath();//+'images\';// добавим в юните дерева
+  sc := TPathBuilder.GetComponentsFolderName(); //ExePath + 'Components\';
+  self.RefreshTreeNumber := 0;
+  {создаем ChatLineTabSheet}
+  ChatLineTabSheet := TsTabSheet.Create(ChatPageControl);
+  if FileExists(sc + 'clTabSheet.txt') then
+    begin
+    strlist.LoadFromFile(sc + 'clTabSheet.txt');
+    StringToComponent(ChatLineTabSheet, strlist.text);
+    end
+  else
+    begin
+    TDebugMan.AddLine2( 'Не найден файл настроек компонента: ' + sc + 'clTabSheet.txt'); //FormDebug.DebugMemo2.Lines.Add('Не найден файл настроек компонента: ' + sc + 'clTabSheet.txt');
+    TDebugMan.AddLine2('Для компонента ' + ChatLineTabSheet.Name + ' используем настройки из .res'); //FormDebug.DebugMemo2.Lines.Add('Для компонента ' + ChatLineTabSheet.Name + ' используем настройки из .res');
+    ChatLineTabSheet.Caption := 'Общий чат';
+    ChatLineTabSheet.ImageIndex := 1;
+    end;
+  ChatLineTabSheet.Name := 'TabSheet_' + inttostr(GetTickCount());//LineName; <- имя может быть не на английском!!!
+
+  if ChatLineName = TDreamChatDefaults.MainChatLineName {'iTCniaM'}
+    then ChatLineTabSheet.UseCloseBtn:= MinimizeOnClose;
+
+  ChatLineTabSheet.Visible := false;
+  //ChatLineTabSheet.TabVisible := false;
+  //Глюк какойто. Пока пусть будет закоменчено.
+  ChatLineTabSheet.Parent := ChatPageControl;
+  ChatLineTabSheet.ParentWindow := ChatPageControl.Handle;
+  ChatLineTabSheet.PageControl := ChatPageControl;
+  ChatLineTabSheet.Visible := false;
+  ChatLineTabSheet.Caption := LineName + ' created';
+  //  ChatLineTabSheet.UseCloseBtn := false;
+  {/создаем ChatLineTree}
+
+  {создаем ChatLineTree}
+  ChatLineTree := TGifVirtualStringTree.CreateGVST(self, ChatLineTabSheet, si);
+  ChatLineTree.Name := 'Tree_' + inttostr(GetTickCount());//LineName; <- имя может быть не на английском!!!
+  ChatLineTree.parent := ChatLineTabSheet;
+  ChatLineTree.ParentWindow := ChatLineTabSheet.Handle;
+  if FileExists(sc + 'clGifVTree.txt') then
+    begin
+    strlist.LoadFromFile(sc + 'clGifVTree.txt');
+    StringToComponent(ChatLineTree, strlist.text);
+    end
+  else
+    begin
+    TDebugMan.AddLine2('Не найден файл настроек компонента: ' + sc + 'clGifVTree.txt'); //FormDebug.DebugMemo2.Lines.Add('Не найден файл настроек компонента: ' + sc + 'clGifVTree.txt');
+    TDebugMan.AddLine2('Для компонента ' + ChatLineTree.Name + ' используем настройки из .res'); //FormDebug.DebugMemo2.Lines.Add('Для компонента ' + ChatLineTree.Name + ' используем настройки из .res');
+    ChatLineTree.Left := 318;
+    ChatLineTree.Top := 0;
+    ChatLineTree.Width := 194;
+    ChatLineTree.Height := 291;
+    ChatLineTree.Align := alRight;
+    ChatLineTree.CheckImageKind := ckCustom;
+    ChatLineTree.DefaultNodeHeight := 16;
+    ChatLineTree.DefaultPasteMode := amInsertAfter;
+    ChatLineTree.Font.Charset := RUSSIAN_CHARSET;
+    ChatLineTree.Font.Color := clWindowText;
+    ChatLineTree.Font.Height := -15;
+    ChatLineTree.Font.Name := 'Tahoma';
+    ChatLineTree.Font.Style := [];
+    ChatLineTree.Header.AutoSizeIndex := -1;
+    ChatLineTree.Header.Font.Charset := RUSSIAN_CHARSET;
+    ChatLineTree.Header.Font.Color := clWindowText;
+    ChatLineTree.Header.Font.Height := -11;
+    ChatLineTree.Header.Font.Name := 'Tahoma';
+    ChatLineTree.Header.Font.Style := [];
+    ChatLineTree.Header.MainColumn := -1;
+    ChatLineTree.Header.Options := [hoColumnResize, hoDrag];
+    ChatLineTree.Indent := 16;
+    ChatLineTree.Margin := 32;
+    ChatLineTree.NodeDataSize := 0;
+    ChatLineTree.ParentFont := False;
+    ChatLineTree.TabOrder := 0;
+    ChatLineTree.TreeOptions.AutoOptions := [toAutoDropExpand, toAutoScrollOnExpand, toAutoSort, toAutoTristateTracking, toAutoDeleteMovedNodes];
+    ChatLineTree.TreeOptions.PaintOptions := [toShowButtons, toShowDropmark, toShowRoot, toThemeAware, toUseBlendedImages];
+    //ChatLineTree.Columns := <>;
+    end;
+  ChatLineTree.Header.Columns.Add;
+  {/создаем ChatLineTree}
+
+  {создаем ChatSplitter}
+  ChatSplitter := TsSplitter.Create(ChatLineTabSheet);
+  if FileExists(sc + 'clGifVTree.txt') then
+    begin
+    strlist.LoadFromFile(sc + 'clChatSplitter.txt');
+    StringToComponent(ChatSplitter, strlist.text);
+    end
+  else
+    begin
+    ChatSplitter.Width := 5;
+    ChatSplitter.Cursor := crHSplit;
+    ChatSplitter.Align := alRight;
+    end;
+  ChatSplitter.parent := ChatLineTabSheet;
+  ChatSplitter.Name := 'Splitter_'  + inttostr(GetTickCount());//LineName; <- имя может быть не на английском!!!
+  ChatSplitter.OnCanResize := ChatSplitterCanResize;
+  {/создаем ChatSplitter}
+
+  {создаем ChatLineView}
+  ChatLineView := TsChatView.Create(ChatLineTabSheet);
+  ChatLineView.Name := 'sChatView_' + inttostr(GetTickCount());//LineName; <- имя может быть не на английском!!!
+  ChatLineView.parent := ChatLineTabSheet;
+  ChatLineView.ParentWindow := ChatLineTabSheet.Handle;
+  ChatLineView.Style := CVStyle;//так надо!
+  if FileExists(sc + 'CLChatLineView.txt') then
+    begin
+    strlist.LoadFromFile(sc + 'CLChatLineView.txt');
+    StringToComponent(ChatLineView, strlist.text);
+    end
+  else
+    begin
+    TDebugMan.AddLine2('Не найден файл настроек компонента: ' + sc + 'CLChatLineView.txt'); //FormDebug.DebugMemo2.Lines.Add('Не найден файл настроек компонента: ' + sc + 'CLChatLineView.txt');
+    TDebugMan.AddLine2('Для компонента ' + ChatLineView.Name + ' используем настройки из .res'); //FormDebug.DebugMemo2.Lines.Add('Для компонента ' + ChatLineView.Name + ' используем настройки из .res');
+
+    ChatLineView.Left := 0;
+    ChatLineView.Top := 0;
+    ChatLineView.Width := 525;
+    ChatLineView.Height := 243;
+    ChatLineView.TabStop := True;
+    ChatLineView.TabOrder := 0;
+    ChatLineView.Align := alClient;
+    ChatLineView.Tracking := True;
+    ChatLineView.VScrollVisible := True;
+    ChatLineView.FirstJumpNo := 0;
+    ChatLineView.MaxTextWidth := 0;
+    ChatLineView.MinTextWidth := 0;
+    ChatLineView.LeftMargin := 5;
+    ChatLineView.RightMargin := 5;
+    ChatLineView.BackgroundStyle := bsNoBitmap;
+    ChatLineView.Delimiters := ' .;,:)}"';
+    ChatLineView.MergeDelimiters := '({"|';
+    ChatLineView.AllowSelection := True;
+    ChatLineView.SingleClick := False;
+    ChatLineView.VScrollBound := 20;
+    ChatLineView.HScrollBound := 20;
+    ChatLineView.BoundLabel.Indent := 0;
+    ChatLineView.BoundLabel.Font.Charset := DEFAULT_CHARSET;
+    ChatLineView.BoundLabel.Font.Color := clWindowText;
+    ChatLineView.BoundLabel.Font.Height := -11;
+    ChatLineView.BoundLabel.Font.Name := 'MS Sans Serif';
+    ChatLineView.BoundLabel.Font.Style := [];
+    //ChatLineView.BoundLabel.Layout := sclLeft;
+    ChatLineView.BoundLabel.MaxWidth := 0;
+    ChatLineView.BoundLabel.UseSkinColor := True;
+    ChatLineView.SkinData.SkinSection := 'EDIT';
+    end;
+  ChatLineView.Style := CVStyle;//так надо!
+  ChatLineView.OnVScrolled := OnVScrolled;
+  ChatLineView.CursorSelection := false;
+  ChatLineView.OnMouseDown := ChatLineViewMouseDown;
+  ChatLineView.Constraints.MinWidth := 50;
+  {/создаем ChatLineView}
+
+  ChatPageControl.ActivePage := ChatLineTabSheet;
+  Self.LocalComputerName := self.GetLocalComputerName();
+  Self.LocalLoginName := GetUserLoginName(); //roma{self.}GetLocalUserLoginName('');
+  Self.LocalIpAddres := '127.0.0.1';
+
+  //if FormMain.ChatConfig.ReadString('ConnectionType', 'Server', 'Yes') <> 'No' then
+  if TDreamChatConfig.GetServer() <> 'No' then //TODO: magic number!  
+  begin
+    LocalIP := GetLocalIP();
+    Self.LocalIpAddres := StrPas(LocalIP);
+    //FormMain.Caption := Self.LocalIpAddres;
+    LocalComputerName := Self.LocalIpAddres + '/' + LocalComputerName + '/' + LocalLoginName;
+  end;
+
+  strlist.Free;
+
+  TimerSendMsgRefresh := TTimer.Create(FormMain);
+  TimerSendMsgRefresh.OnTimer := Self.Scheduler;
+  TimerSendMsgRefresh.Interval := Self.AutoRefreshTime;
+  TimerSendMsgRefresh.Enabled := true;
+
+  ChatLineTabSheet.Visible := true;
+  //ChatLineTabSheet.TabVisible := true;
+  ChatPageControl.ActivePage := ChatLineTabSheet;  
+end;
+
+destructor TChatLine.Destroy;
+var n: word;
+    FileStream: TFileStream;
+begin
+if FileExists(FFullLogFileName) then
+  begin
+  FileStream := TFileStream.Create(FFullLogFileName, fmOpenWrite);
+  FileStream.Seek(0, soFromEnd);
+  FileStream.write(pointer(LineLog.Text)^, length(LineLog.Text));
+  FileStream.Free;
+  end
+else
+  LineLog.SaveToFile(FFullLogFileName);
+LineLog.Free;
+
+TimerSendMsgRefresh.Enabled := false;
+ChatLineTabSheet.Visible := false;
+ChatLineView.Clear;
+ChatLineView.Free;
+ChatLineView := nil;//надо для последующей проверки! иначе AV в SaveUserSettingsToIni()
+
+//какие-то мега глюки с разрушением линий при помощи Destroy
+//походу там что-то не успевает разрушаться...
+if self.FChatLineName = TDreamChatDefaults.MainChatLineName {'iTCniaM'}
+  then ChatLineTree.Destroy//TODO: ВНИМАНИЕ!!! Возможно нужно реализовать!!
+  else ChatLineTree.Free;//TODO: ВНИМАНИЕ!!! Возможно нужно реализовать!!
+
+ChatSplitter.Free;
+if Length(Self.ChatLineUsers) > 0 then
+  begin
+  for n := 0 to Length(Self.ChatLineUsers) - 1 do
+    begin
+    ChatLineUsers[n].Free;
+    end;
+  end;
+SetLength(ChatLineUsers, 0);
+
+//SmilesName.Free;
+UsersConnectHistory.Free;
+MessagesHistory.Free;
+ChatLineTabSheet.Free;
+TimerSendMsgRefresh.Free;
+
+inherited Destroy;
+end;
+
+procedure TChatLine.Assign(Source: TPersistent);
+var n:word;
+begin
+  if Source is TChatLine then
+    begin
+    Self.ChatLineName := TChatLine(Source).ChatLineName;
+    Self.ChatLineTabSheet.Assign(TTabSheet(TChatLine(Source).ChatLineTabSheet));
+    Self.ChatLineView.Assign(TsChatView(TChatLine(Source).ChatLineView));
+    Self.ChatLineTree.Assign(TTreeView(TChatLine(Source).ChatLineTree));
+    Self.ChatSplitter.Assign(TSplitter(TChatLine(Source).ChatSplitter));
+    Self.MessagesHistory.Assign(TStringList(TChatLine(Source).MessagesHistory));
+    self.UsersConnectHistory.Assign(TChatLine(Source).UsersConnectHistory);
+    Self.FFullLogFileName := TChatLine(Source).FFullLogFileName;
+    Self.LineLog.Assign(TStringList(TChatLine(Source).LineLog));
+    Self.FAutoRefreshTime := TChatLine(Source).FAutoRefreshTime;
+   // Self.UsersCount := TChatLine(Source).UsersCount;
+    self.RefreshTreeNumber := TChatLine(Source).RefreshTreeNumber;
+
+    if Length(Self.ChatLineUsers) > 0 then
+      begin
+      for n := 0 to Length(Self.ChatLineUsers) - 1 do
+        begin
+        Self.ChatLineUsers[n].Assign(TChatUser(TChatLine(Source).ChatLineUsers[n]));
+        end;
+      end;
+
+    Self.OnCmdConnect := TChatLine(Source).OnCmdConnect;
+    Self.OnCmdDisconnect := TChatLine(Source).OnCmdDisconnect;
+    Self.OnCmdText := TChatLine(Source).OnCmdText;
+    Self.OnCmdRefresh := TChatLine(Source).OnCmdRefresh;
+    Self.OnCmdRename := TChatLine(Source).OnCmdRename;
+    Self.OnCmdCreate := TChatLine(Source).OnCmdCreate;
+    Self.OnCmdCreateLine := TChatLine(Source).OnCmdCreateLine;
+    Self.OnCmdReceived := TChatLine(Source).OnCmdReceived;
+    Self.OnCmdBoard := TChatLine(Source).OnCmdBoard;
+    Self.OnCmdStatus := TChatLine(Source).OnCmdStatus;
+    Self.OnCmdStatus_Req := TChatLine(Source).OnCmdStatus_Req;
+//    Self.Sheduler := TChatLine(Source).Sheduler;
+//    Self.MessageProtocolProcessing := TChatLine(Source).MessageProtocolProcessing;
+    end
+  else
+    inherited Assign(Source);
+end;
+
+FUNCTION TChatLine.GetSafetyLogFileName(FileNameWithExceptSymbols: string):string;
+VAR
+   c: cardinal;
+   i: integer;
+   LineNode: TLineNode;
+   MainLine: TChatLine;
+BEGIN
+//убираем символы-исключения из названия линии
+//иначе мы не сможет создать файл лога с таким именем.
+//result := FileNameWithExceptSymbols;
+for c := 1 to Length(FileNameWithExceptSymbols) do begin
+  if ((Byte(FileNameWithExceptSymbols[c]) > 0) and (Byte(FileNameWithExceptSymbols[c]) < 32)) or
+     (FileNameWithExceptSymbols[c] in ['"', '/', ':', '*', '?', '<', '>', '\',
+       '|', ';', '*']) then begin
+       // nothing to do
+  end
+  else
+  begin
+    Result := Result + FileNameWithExceptSymbols[c];
+  end
+end;
+
+if Length(Result) = 0 then begin
+  //какой-то юзер создал линию, название которой состоит только из символ-исключений!
+  //попробуем его определить...
+  Result := UNKNOWN_LOG_FILE_NAME;
+  MainLine := FormMain.GetMainLine();
+  if MainLine <> nil then begin
+    for c := 0 to MainLine.UsersCount - 1 do begin
+      i := MainLine.ChatLineUsers[c].ChatLinesList.IndexOf(self.FChatLineName);
+      if i > 0 then begin
+        LineNode := TLineNode(MainLine.ChatLineUsers[c].ChatLinesList.Objects[i]);
+        Self.LineLog.Add('[' + TimeToStr(Now) + '] Line with name ' +
+                    '''' + self.FChatLineName + '''' + ' was created by ' + '''' +
+                    LineNode.LineOwner + '''' + ' by command: ' + LineNode.CreatedByCommand);
+        break;
+      end;
+    end;
+
+    if i < 0 then begin
+      Self.LineLog.Add('Line with name ' + '''' + self.FChatLineName + '''' + ' was created by unknown user')
+    end
+  end;
+end;
+END;
+
+{FUNCTION TChatLine.StrToIntE(s: string):integer;
+BEGIN
+result := 0;
+try
+  result := strtoint(s);
+except
+    //on E:EConvertError do
+  on E:Exception do
+    begin
+    FormMain.ProcessException(Self, E);
+    end;
+end;
+END;
+}
+
+{================ главная функция обработки протокола сообщений ===============}
+{            здесь мы автоматически отвечаем на служебные сообщения            }
+{             и ведем список пользователей, входящих/покидающих чат            }
+{==============================================================================}
+PROCEDURE TChatLine.MessageProtocolProcessing(pReceivedMessage: PChar);
+VAR sReceivedMessage, s:string;
+    c, id, MainLineUID:cardinal;
+    i: integer;
+    tLocalUser:TChatUser;
+    MainLine: TChatLine;
+    MessBoardNumber:cardinal;
+    DoUpdate:boolean;
+    StrList:TStringList;
+    LineNode: TLineNode;
+    PDNode: PDataNode;
+BEGIN
+sReceivedMessage := pReceivedMessage;
+id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+if id <> INVALID_USER_ID then
+  begin
+  //если у компа 2 и более сетевых интерфейса, то маилслот открывается на каждом из них
+  //соответственно с каждого приходят копии. Кроме REFRESH!!! он может иметь тотже номер!
+  if ChatMode = cmodMailSlot then
+    begin
+    if (GetParamX(sReceivedMessage, 3, #19#19, true) <> 'REFRESH') and
+      (self.ChatLineUsers[id].LastReceivedMessNumber >= StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true))) then exit;
+    end;
+  end;
+
+id := INVALID_USER_ID;
+LineNode := nil;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'CONNECT' then
+  begin
+  //iChat309VETALCONNECTiTCniaMВеталь_loginВетальВсем привет!ANDREY1.21b60
+  //принята команда CONNECT
+  //messagebox(0, PChar(GetParamX(sReceivedMessage, 2, #19#19, true)), 'ищем ID приконнективщегося юзера' ,mb_ok);
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     GetParamX(sReceivedMessage, 6, #19#19, true),
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id = INVALID_USER_ID then
+    begin
+      //если такого юзера не было в списке юзеров, то в чат вошел новый юзер
+      //вот в чем проблема:
+      //я говорю коннект мне отвечают коннект, но их еще в списке пользователей нет
+      //поэтому я опять говорю коннект
+    //messagebox(0, PChar(GetParamX(sReceivedMessage, 2, #19#19, true)), 'ID приконнективщегося юзера НЕ НАЙДЕН!' ,mb_ok);
+    MainLine := FormMain.GetMainLine();
+    if (
+        (AnsiCompareText(GetParamX(sReceivedMessage, 2, #19#19, true), LocalComputerName) <> 0) and
+        (AnsiCompareText(GetParamX(sReceivedMessage, 9, #19#19, true), '*') = 0)
+       )
+        or
+       (
+        (AnsiCompareText(GetParamX(sReceivedMessage, 2, #19#19, true), LocalComputerName) <> 0) and
+        (AnsiCompareText(GetParamX(sReceivedMessage, 9, #19#19, true), LocalComputerName) = 0) {and
+        (AnsiCompareText(GetParamX(sReceivedMessage, 5, #19#19, true), LocalLoginName) <> 0) }{and
+        (AnsiCompareText(GetParamX(sReceivedMessage, 6, #19#19, true), LocalNickName) = 0)
+        })
+        or
+        (AnsiCompareText(GetParamX(sReceivedMessage, 5, #19#19, true), LocalLoginName) <> 0) then
+      begin
+      //если получили сообщение CONNECT, не от себя и оно
+      //не является ответом на мое сообщение CONNECT
+      //значит пришел новый юзер и нужно поздороваться
+      //messagebox(0, PChar(GetParamX(sReceivedMessage, 2, #19#19, true)), 'значит пришел новый юзер и нужно поздороваться!' ,mb_ok);
+      if (AnsiCompareText(GetParamX(sReceivedMessage, 4, #19#19, True), TDreamChatDefaults.MainChatLineName {'iTCniaM'}) <> 0) and
+        (MainLine.GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true)) = INVALID_USER_ID) then
+        begin
+        //если юзера нет еще в главной ветке, а от него пришел CONNECT в новую ветку.
+        SendDisconnectConnect(pReceivedMessage);
+        exit;
+        end;
+
+      tLocalUser := Self.GetUserInfo(Self.GetLocalUserId());
+      if tLocalUser = nil then
+        begin
+        TDebugMan.AddLine2('В этой линии еще нет локального пользователя, запрашиваем из iTCniaM'); //FormDebug.DebugMemo2.Lines.Add('В этой линии еще нет локального пользователя, запрашиваем из iTCniaM');
+        tLocalUser := MainLine.GetUserInfo(MainLine.GetLocalUserId());
+        end;
+      if tLocalUser = nil then
+        begin
+        //Внимание! Получено сообщение от другого пользователя, до того
+        //как произошла инициализация локального пользователя!
+        TDebugMan.AddLine2('Внимание! Локальный ползователь еще не вошел в  iTCniaM!' +
+                                  'Создаем временного локального пользователя...');
+         //FormDebug.DebugMemo2.Lines.Add('Внимание! Локальный ползователь еще не вошел в  iTCniaM!' +
+         //                         'Создаем временного локального пользователя...');
+        //ПРИНУДИТЕЛЬНО создаем ВРЕМЕННОГО локального пользователя, чтобы отправить
+        //правильный ответ этому шустряку
+        tLocalUser := TChatUser.Create(self, '');//TODO: ОСТОРОЖНО!!! не приведет '' ли это к ошибке?
+        //Внимание! Обнаружена утечка памяти!
+        //TODO: Подумать как удалить ВРЕМЕННОГО пользователя.
+        tLocalUser.ComputerName := self.LocalComputerName;
+        tLocalUser.IP := LocalIpAddres;
+
+        tLocalUser.Login := self.LocalLoginName;
+        tLocalUser.NickName := LocalNickName;
+        tLocalUser.DisplayNickName := LocalNickName;
+        tLocalUser.LineName := self.FChatLineName;
+        //tLocalUser.Version := VERSION;
+        tLocalUser.Version := 'Not init';
+        tLocalUser.ReceivedMessCount := 0;
+        tLocalUser.LastReceivedMessNumber := 0;
+        tLocalUser.TimeInChat := GetTickCount();
+        tLocalUser.TimeOfLastMess := GetTickCount();
+        tLocalUser.Status := dcsNormal;
+        tLocalUser.MessageStatus.Clear;
+
+        TDreamChatConfig.FillMessagesState(tLocalUser.MessageStatus);
+        StrList := TStringList.Create;
+{        for i := 0 to 3 do begin
+          FormMain.ChatConfig.ReadSectionValues('MessagesState' + IntToStr(i), StrList);
+          if StrList.Count > 0 then
+            tLocalUser.MessageStatus.Add(StrList.Strings[0])
+          else
+            tLocalUser.MessageStatus.Add('Hi all!');
+        end;
+        StrList.Clear;}
+        tLocalUser.ProtoName := TDreamChatConfig.GetProtoName(); //FormMain.ChatConfig.ReadString('Protocols', 'ProtoName', 'iChat');
+        StrList.LoadFromFile(TPathBuilder.GetExePath() + TDreamChatConfig.GetMessageBoard()); //FormMain.ChatConfig.ReadString('Common', 'MessageBoard', 'MessageBoard.txt'));
+        tLocalUser.MessageBoard.Text := StrList.Text;
+        StrList.Free;
+        end;
+
+//    messagebox(0, PChar(inttostr(UsersCount)), 'UsersCount = ' ,mb_ok);
+      SetLength(Self.ChatLineUsers, UsersCount + 1);
+      ChatLineUsers[UsersCount - 1] := TChatUser.Create(Self, sReceivedMessage);//TODO: МОДИФИЦИРОВАТЬ КОНСТРУКТОР!! Передавать в него параметры накачки!!
+      ChatLineUsers[UsersCount - 1].ComputerName := GetParamX(sReceivedMessage, 2, #19#19, true);
+      ChatLineUsers[UsersCount - 1].Login := GetParamX(sReceivedMessage, 5, #19#19, true);
+      ChatLineUsers[UsersCount - 1].NickName := GetParamX(sReceivedMessage, 6, #19#19, true);
+      ChatLineUsers[UsersCount - 1].Status := TDreamChatStatus(StrToIntE(GetParamX(sReceivedMessage, 11, #19#19, True)));
+      if ChatLineUsers[UsersCount - 1].ComputerName <> Self.LocalComputerName then
+        begin
+        while Ord(ChatLineUsers[UsersCount - 1].Status) >= ChatLineUsers[UsersCount - 1].MessageStatus.Count do
+          begin
+          ChatLineUsers[UsersCount - 1].MessageStatus.Add('');
+          end;
+        ChatLineUsers[UsersCount - 1].MessageStatus.Strings[Ord(ChatLineUsers[UsersCount - 1].Status)] := GetParamX(sReceivedMessage, 8, #19#19, True);
+        end;
+      //ChatLineUsers[UsersCount - 1].MessageStatus.Clear;
+      //ChatLineUsers[UsersCount - 1].MessageStatus.Add(GetParamX(sReceivedMessage, 8, #19#19, true));
+      ChatLineUsers[UsersCount - 1].LineName := (GetParamX(sReceivedMessage, 4, #19#19, true));
+      ChatLineUsers[UsersCount - 1].Version := GetParamX(sReceivedMessage, 10, #19#19, true);
+      ChatLineUsers[UsersCount - 1].ReceivedMessCount := ChatLineUsers[UsersCount - 1].ReceivedMessCount + 1;
+      ChatLineUsers[UsersCount - 1].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+      if ChatMode = cmodTCP then ChatLineUsers[UsersCount - 1].Ip := GetParamX(ChatLineUsers[UsersCount - 1].ComputerName, 0, '/', true);
+      ChatLineUsers[UsersCount - 1].TimeInChat := GetTickCount();
+      ChatLineUsers[UsersCount - 1].TimeOfLastMess := GetTickCount();
+      //messagebox(0, PChar(inttostr(ChatLineUsers[UsersCount - 1].UserID)), 'новый ID' ,mb_ok);
+      ChatLineUsers[UsersCount - 1].ProtoName := GetParamX(sReceivedMessage, 1, #19, true);
+      //}
+      ChatLineUsers[UsersCount - 1].DisplayNickName := Self.GetUniqueNickName(ChatLineUsers[UsersCount - 1].UserID);
+      //заполняем список пользователей выделеных галочкой или стрелкой
+      case ChatLineUsers[UsersCount - 1].CN_State of
+        CNS_Personal: UserListCNS_Personal.Add(Self.ChatLineUsers[UsersCount - 1].ComputerName);
+        CNS_Private: UserListCNS_Private.Add(Self.ChatLineUsers[UsersCount - 1].ComputerName);
+        end;
+
+      //FormMain.ShowUserInTree(self, UsersCount - 1, ShowUser_ADD);
+      //добавляем список линий в которых учавствует юзер
+      if MainLine <> nil then
+        begin
+        //проверяем вдруг она там уже есть
+        MainLineUID := MainLine.GetUserIdByCompName(ChatLineUsers[UsersCount - 1].ComputerName);
+        if MainLineUID <> INVALID_USER_ID then
+          begin
+          if MainLine.ChatLineUsers[MainLineUID].ChatLinesList.IndexOf(Self.ChatLineUsers[UsersCount - 1].LineName) < 0 then
+            begin
+            LineNode := TLineNode.Create(ChatLineUsers[UsersCount - 1].LineName, LS_LineObjectCreated);
+            LineNode.LineName := GetParamX(sReceivedMessage, 4, #19#19, true);
+            LineNode.LineType := FormMain.GetLineType(LineNode.LineName);
+            if LineNode.LineType = LT_COMMON then LineNode.DisplayLineName := fmInternational.Strings[I_CommonChat];//'Общий';
+            if LineNode.LineType = LT_PRIVATE_CHAT then LineNode.DisplayLineName := fmInternational.Strings[I_Private];//'Приват';
+//            if LineNode.LineType = LT_LINE then LineNode.DisplayLineName := fmInternational.Strings[I_LINE];//'Линия';
+            if LineNode.LineType = LT_LINE then LineNode.DisplayLineName := LineNode.LineName;//'Линия';
+            LineNode.CreatedByCommand := 'Connect';
+            LineNode.LineOwner := ChatLineUsers[UsersCount - 1].ComputerName;
+            LineNode.LineOwnerId := UsersCount - 1;
+            LineNode.LineUsers.Add(LineNode.LineOwner);
+            LineNode.TimeCreate := Now();
+            LineNode.TimeOfLastMess := GetTickCount();
+            LineNode.LineID := MainLine.ChatLineUsers[MainLineUID].ChatLinesList.AddObject(Self.ChatLineUsers[UsersCount - 1].LineName, LineNode);
+            TDebugMan.AddLine2('Линия ' + Self.ChatLineUsers[UsersCount - 1].LineName +
+                                      ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+                                       //FormDebug.DebugMemo2.Lines.Add('Линия ' + Self.ChatLineUsers[UsersCount - 1].LineName +
+                                      //' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+            //FormMain.ShowLinesInTree(self, ChatLineUsers[UsersCount - 1], LineNode, ShowLine_ADD);
+            end
+          else
+            begin
+            //сюда попадаем, если приват/линия были добавлены в дерево командой REFRESH
+            //а потом юзер в них вошел!
+            end;
+          end;
+        end;
+
+      self.OnCmdConnect(self, sReceivedMessage, UsersCount - 1);
+      SendCommConnect(PChar(tLocalUser.ProtoName),
+                      PChar(LocalNickName),
+                      Pchar(GetParamX(sReceivedMessage, 2, #19#19, true)),
+                      PChar(self.ChatLineName){'iTCniaM'},
+                      Pchar(GetParamX(sReceivedMessage, 2, #19#19, true)),
+                      PChar(tLocalUser.MessageStatus.Strings[Ord(tLocalUser.Status)]),
+                      Ord(tLocalUser.Status));
+      SendCommStatus(PChar(tLocalUser.ProtoName),
+                     PChar(GetParamX(sReceivedMessage, 2, #19#19, true)),
+                     Ord(tLocalUser.Status),
+                     PChar(tLocalUser.MessageStatus.strings[Ord(tLocalUser.Status)]));
+      SendCommBoard(PChar(tLocalUser.ProtoName), PChar(GetParamX(sReceivedMessage, 2, #19#19, true)), PChar(tLocalUser.MessageBoard.Text), TDreamChatConfig.GetMaxSizeOfMessBoardPart());
+
+      //FormMain.ShowAllUserInTree(self);
+      //messagebox(0, PChar(GetParamX(sReceivedMessage, 2, #19#19, true)), 'завели нового юзера и поздоровались!' ,mb_ok);
+      //if tLocalUser <> nil then tLocalUser.free;//подумать нужно ли убивать TEMP_tLocalUser
+      end
+    else
+      begin
+      //если коннект от меня
+      TDebugMan.AddLine2('[' + self.ChatLineName + ']: Появляется локальный юзер.'); //FormDebug.DebugMemo2.Lines.Add('[' + self.ChatLineName + ']: Появляется локальный юзер.');
+    //  UsersCount := UsersCount + 1;
+      SetLength(Self.ChatLineUsers, UsersCount + 1);
+      ChatLineUsers[UsersCount - 1] := TChatUser.Create(Self, sReceivedMessage);
+      //{
+      ChatLineUsers[UsersCount - 1].ComputerName := GetParamX(sReceivedMessage, 2, #19#19, true);
+      ChatLineUsers[UsersCount - 1].Login := GetParamX(sReceivedMessage, 5, #19#19, true);
+      ChatLineUsers[UsersCount - 1].NickName := GetParamX(sReceivedMessage, 6, #19#19, true);
+      ChatLineUsers[UsersCount - 1].Status := TDreamChatStatus(StrToIntE(GetParamX(sReceivedMessage, 11, #19#19, True)));
+      StrList := TStringList.Create;
+
+      TDreamChatConfig.FillMessagesState(ChatLineUsers[UsersCount - 1].MessageStatus);
+{      for i := 0 to 3 do begin
+        FormMain.ChatConfig.ReadSectionValues('MessagesState' + IntToStr(i), StrList);
+        if StrList.Count > 0 then begin
+          ChatLineUsers[UsersCount - 1].MessageStatus.Add(StrList.Strings[0]);
+        end
+        else
+          ChatLineUsers[UsersCount - 1].MessageStatus.Add('Hi all!');
+      end;}
+
+      StrList.free;
+      //ChatLineUsers[UsersCount - 1].MessageStatus.Clear;
+      //ChatLineUsers[UsersCount - 1].MessageStatus.Add(GetParamX(sReceivedMessage, 8, #19#19, true));
+      ChatLineUsers[UsersCount - 1].LineName := (GetParamX(sReceivedMessage, 4, #19#19, true));
+      ChatLineUsers[UsersCount - 1].Version := GetParamX(sReceivedMessage, 10, #19#19, true);
+      ChatLineUsers[UsersCount - 1].ReceivedMessCount := ChatLineUsers[UsersCount - 1].ReceivedMessCount + 1;
+      ChatLineUsers[UsersCount - 1].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+      ChatLineUsers[UsersCount - 1].TimeInChat := GetTickCount();
+      ChatLineUsers[UsersCount - 1].TimeOfLastMess := GetTickCount();
+      if ChatMode = cmodTCP then ChatLineUsers[UsersCount - 1].Ip := GetParamX(ChatLineUsers[UsersCount - 1].ComputerName, 0, '/', true);
+      ChatLineUsers[UsersCount - 1].ProtoName := GetParamX(sReceivedMessage, 1, #19, true);
+      //}
+      ChatLineUsers[UsersCount - 1].DisplayNickName := Self.GetUniqueNickName(self.ChatLineUsers[UsersCount - 1].UserID);
+      //FormMain.ShowUserInTree(self, UsersCount - 1, ShowUser_ADD);
+      //добавляем список линий в которых учавствует юзер
+      if MainLine <> nil then
+        begin
+        //проверяем вдруг она там уже есть
+        MainLineUID := MainLine.GetUserIdByCompName(ChatLineUsers[UsersCount - 1].ComputerName);
+        if MainLineUID <> INVALID_USER_ID then
+          begin
+          if MainLine.ChatLineUsers[MainLineUID].ChatLinesList.IndexOf(Self.ChatLineUsers[UsersCount - 1].LineName) < 0 then
+            begin
+            LineNode := TLineNode.Create(ChatLineUsers[UsersCount - 1].LineName, LS_LineObjectCreated);
+            LineNode.LineName := GetParamX(sReceivedMessage, 4, #19#19, true);
+            LineNode.LineType := FormMain.GetLineType(LineNode.LineName);
+            if LineNode.LineType = LT_COMMON then LineNode.DisplayLineName := fmInternational.Strings[I_COMMONChat];//'Общий';
+            if LineNode.LineType = LT_PRIVATE_CHAT then LineNode.DisplayLineName := fmInternational.Strings[I_PRIVATE];//'Приват';
+//            if LineNode.LineType = LT_LINE then LineNode.DisplayLineName := fmInternational.Strings[I_LINE];//'Линия';
+            if LineNode.LineType = LT_LINE then LineNode.DisplayLineName := LineNode.LineName;//'Линия';
+            LineNode.CreatedByCommand := 'Connect';
+            LineNode.LineOwner := ChatLineUsers[UsersCount - 1].ComputerName;
+            LineNode.LineOwnerID := UsersCount - 1;
+            LineNode.LineUsers.Add(LineNode.LineOwner);
+            LineNode.TimeCreate := Now();
+            LineNode.TimeOfLastMess := GetTickCount();
+            LineNode.LineID := MainLine.ChatLineUsers[MainLineUID].ChatLinesList.AddObject(Self.ChatLineUsers[UsersCount - 1].LineName, LineNode);
+            TDebugMan.AddLine2('Линия ' + Self.ChatLineUsers[UsersCount - 1].LineName +
+                                      ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+             //FormDebug.DebugMemo2.Lines.Add('Линия ' + Self.ChatLineUsers[UsersCount - 1].LineName +
+               //                       ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+            //FormMain.ShowLinesInTree(self, ChatLineUsers[UsersCount - 1], LineNode, ShowLine_ADD);
+            end;
+          end;
+        end;
+
+      //    messagebox(0, PChar(inttostr(ChatLineUsers[UsersCount - 1].UserID)), 'новый ID' ,mb_ok);
+      self.OnCmdConnect(self, sReceivedMessage, UsersCount - 1);
+      tLocalUser := GetUserInfo(GetLocalUserId());
+      if (tLocalUser <> nil) then
+        if (tLocalUser.ComputerName <> ChatLineUsers[UsersCount - 1].ComputerName) then
+          begin
+          SendCommStatus(PChar(ChatLineUsers[UsersCount - 1].ProtoName),
+                         PChar(GetParamX(sReceivedMessage, 2, #19#19, True)),
+                         Ord(tLocalUser.Status),
+                         PChar(tLocalUser.MessageStatus.strings[Ord(tLocalUser.Status)]));
+          SendCommBoard(PChar(ChatLineUsers[UsersCount - 1].ProtoName),
+                        PChar(GetParamX(sReceivedMessage, 2, #19#19, True)), PChar(tLocalUser.MessageBoard.Text), TDreamChatConfig.GetMaxSizeOfMessBoardPart());
+          end;
+      end;
+//потом разремарить оптимизацию (тут 10 раз вычитание не делается)
+    end
+  else
+    begin
+    //в чат вошел уже существующий юзер (обновим его)
+    //messagebox(0, PChar(inttostr(id)), 'в чат вошел уже существующий юзер (обновим его)' ,mb_ok);
+//    ChatLineUsers[id].UserID := id;
+    ChatLineUsers[id].ComputerName := GetParamX(sReceivedMessage, 2, #19#19, true);
+    ChatLineUsers[id].Login := GetParamX(sReceivedMessage, 5, #19#19, true);
+    ChatLineUsers[id].NickName := GetParamX(sReceivedMessage, 6, #19#19, true);
+    ChatLineUsers[id].Status := TDreamChatStatus(StrToIntE(GetParamX(sReceivedMessage, 11, #19#19, True)));
+    ChatLineUsers[id].MessageStatus.Clear;
+    ChatLineUsers[id].MessageStatus.Add(GetParamX(sReceivedMessage, 8, #19#19, true));
+    ChatLineUsers[id].Version := GetParamX(sReceivedMessage, 10, #19#19, true);
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeInChat := GetTickCount();
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    if ChatMode = cmodTCP then ChatLineUsers[id].Ip := GetParamX(ChatLineUsers[id].ComputerName, 0, '/', true);
+    ChatLineUsers[id].DisplayNickName := Self.GetUniqueNickName(self.ChatLineUsers[id].UserID);
+    ChatLineUsers[id].ProtoName := GetParamX(sReceivedMessage, 1, #19, true);
+
+    //FormMain.ShowUserInTree(self, id, ShowUser_REDRAW);
+    //обновляем список линий в которых учавствует юзер
+    if (MainLine <> nil) and (MainLine.ChatLineUsers[id].ChatLinesList.IndexOf(GetParamX(sReceivedMessage, 4, #19#19, true)) < 0) then
+      begin
+      //MainLine.ChatLineUsers[id].ChatLinesList.Clear;
+      LineNode := TLineNode.Create(ChatLineUsers[id].LineName, LS_LineObjectCreated);
+      LineNode.LineName := GetParamX(sReceivedMessage, 4, #19#19, true);
+      LineNode.LineType := FormMain.GetLineType(LineNode.LineName);
+      if LineNode.LineType = LT_COMMON then LineNode.DisplayLineName := fmInternational.Strings[I_COMMONCHAT];//'Общий';
+      if LineNode.LineType = LT_PRIVATE_CHAT then LineNode.DisplayLineName := fmInternational.Strings[I_PRIVATE];//'Приват';
+      if LineNode.LineType = LT_LINE then LineNode.DisplayLineName := fmInternational.Strings[I_LINE];//'Линия';
+      LineNode.CreatedByCommand := 'Connect';
+      LineNode.LineOwner := ChatLineUsers[UsersCount - 1].ComputerName;
+      LineNode.LineUsers.Add(LineNode.LineOwner);
+      LineNode.TimeCreate := Now();
+      LineNode.TimeOfLastMess := GetTickCount();
+      MainLine.ChatLineUsers[MainLineUID].ChatLinesList.AddObject(Self.ChatLineUsers[id].LineName, LineNode);
+      MainLine.ChatLineUsers[MainLineUID].ChatLinesList.Add(Self.ChatLineUsers[id].LineName);
+      TDebugMan.AddLine2('Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName); //FormDebug.DebugMemo2.Lines.Add('Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+      //FormMain.ShowLinesInTree(self, ChatLineUsers[UsersCount - 1], LineNode, ShowLine_REDRAW);
+      end;
+
+      FormMain.ShowAllUserInTree(self);
+//    messagebox(0, PChar('id=' + inttostr(id)), 'в чат вошел уже существующий юзер (обновили его!)' ,mb_ok);
+//    self.OnCmdConnect(self, sReceivedMessage, id);
+//    messagebox(0, PChar(GetParamX(sReceivedMessage, 2, #19#19, true)), 'значит пришел новый юзер и нужно поздороваться!' ,mb_ok);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'CREATE' then
+  begin
+  //!iChat!!527!!KITTY!!CREATE!!856000!!!!ANDREY!
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    //обработка CREATE еще выполняется MainLine.MessageProtocolProcessing
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+
+    //добавляем новый приват в список линий этого юзера
+    MainLine := FormMain.GetMainLine();
+    if MainLine <> nil then
+      begin
+      MainLineUID := MainLine.GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+      if MainLineUID <> INVALID_USER_ID then
+        begin
+        //проверяем вдруг она там уже есть
+        //messagebox(0, PChar('MainLineUID <> INVALID_USER_ID'), '' ,mb_ok);
+        if MainLine.ChatLineUsers[MainLineUID].ChatLinesList.IndexOf(GetParamX(sReceivedMessage, 4, #19#19, true)) < 0 then
+          begin
+          LineNode := TLineNode.Create(ChatLineUsers[id].LineName, LS_LineObjectCreated);
+          LineNode.LineName := GetParamX(sReceivedMessage, 4, #19#19, true);
+          LineNode.DisplayLineName := fmInternational.Strings[I_PRIVATE];//'Приват';
+          LineNode.CreatedByCommand := 'CREATE';
+          LineNode.LineOwner := ChatLineUsers[id].ComputerName;
+          LineNode.LineOwnerId := id;
+          LineNode.LineUsers.Add(LineNode.LineOwner);
+          LineNode.TimeCreate := Now();
+          LineNode.TimeOfLastMess := GetTickCount();
+          LineNode.LineType := LT_PRIVATE_CHAT;
+          LineNode.LineID := MainLine.ChatLineUsers[MainLineUID].ChatLinesList.AddObject(GetParamX(sReceivedMessage, 4, #19#19, true), LineNode);
+          TDebugMan.AddLine2('CREATE: Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName); //FormDebug.DebugMemo2.Lines.Add('CREATE: Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+          end;
+        end;
+      end;
+
+    //создали линию личного чата
+    self.OnCmdCREATE(self, sReceivedMessage, id);
+    //FormMain.ShowLinesInTree(self, ChatLineUsers[id], LineNode, ShowLine_ADD);
+    FormMain.ShowAllUserInTree(self);
+    tLocalUser := GetUserInfo(GetLocalUserId());
+    //если сообщение пришло не от себя самого, то посылаем коннект
+    //удаленному компу, чтобы он ответил и самому себе, что появиться у себя в линии
+    //да бы не было AV
+    if tLocalUser <> nil then
+    begin
+      //если CREATE не от себя
+      if (AnsiCompareText(GetParamX(sReceivedMessage, 2, #19#19, true), LocalComputerName) <> 0) then
+        begin
+        //себе
+        SendCommConnect(PChar(tLocalUser.ProtoName),
+                        PChar(tLocalUser.NickName),
+                        PChar(LocalComputerName),
+                        PChar(GetParamX(sReceivedMessage, 4, #19#19, true)),
+                        PChar(LocalComputerName),
+                        PChar(tLocalUser.MessageStatus.Strings[Ord(tLocalUser.Status)]),
+                        Ord(tLocalUser.Status));
+        end;
+      //удаленному компу
+      SendCommConnect(PChar(tLocalUser.ProtoName),
+                      PChar(tLocalUser.NickName),
+                      PChar(GetParamX(sReceivedMessage, 2, #19#19, true)),
+                      PChar(GetParamX(sReceivedMessage, 4, #19#19, true)),
+                      '*',
+                      PChar(tLocalUser.MessageStatus.Strings[Ord(tLocalUser.Status)]),
+                      Ord(tLocalUser.Status));
+      end;
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+    ///SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'CREATE_LINE' then
+  begin
+  //iChat613192.168.1.4/ANDREY/UserCREATE_LINEНовая линия192.168.1.4/ANDREY/User
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    //обработка CREATE еще выполняется MainLine.MessageProtocolProcessing
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+
+    //добавляем новую линию в список линий этого юзера
+    MainLine := FormMain.GetMainLine();
+    if MainLine <> nil then
+      begin
+      MainLineUID := MainLine.GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+      if MainLineUID <> INVALID_USER_ID then
+        begin
+        //проверяем вдруг она там уже есть
+        //messagebox(0, PChar('MainLineUID <> INVALID_USER_ID'), '' ,mb_ok);
+        if MainLine.ChatLineUsers[MainLineUID].ChatLinesList.IndexOf(GetParamX(sReceivedMessage, 4, #19#19, true)) < 0 then
+          begin
+          LineNode := TLineNode.Create(ChatLineUsers[id].LineName, LS_LineObjectCreated);
+          LineNode.LineName := GetParamX(sReceivedMessage, 4, #19#19, true);
+          LineNode.DisplayLineName := LineNode.LineName;
+          LineNode.CreatedByCommand := 'CREATE_LINE';
+          LineNode.LineOwner := ChatLineUsers[id].ComputerName;
+          LineNode.LineOwnerId := id;
+          LineNode.LineUsers.Add(LineNode.LineOwner);
+          LineNode.TimeCreate := Now();
+          LineNode.TimeOfLastMess := GetTickCount();
+          LineNode.LineType := LT_LINE;
+          LineNode.LineID := MainLine.ChatLineUsers[MainLineUID].ChatLinesList.AddObject(GetParamX(sReceivedMessage, 4, #19#19, true), LineNode);
+          TDebugMan.AddLine2('CREATE_LINE: Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName); //FormDebug.DebugMemo2.Lines.Add('CREATE_LINE: Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+          //FormMain.ShowLinesInTree(MainLine, ChatLineUsers[id], LineNode, ShowLine_ADD);
+          FormMain.ShowAllUserInTree(self);
+          if PlaySounds then
+            SoundOnCommCreate(integer(MainLine.LineType), PChar(sReceivedMessage), PChar(ChatLineUsers[id].SoundCreate), id);
+          end;
+        end;
+      end;
+
+    if ChatLineUsers[id].ComputerName <> LocalComputerName then
+      begin
+      //self.OnCmdCREATELINE(self, sReceivedMessage, id);
+      end
+    else
+      begin
+      //если сообщение пришло от самого себя
+      //создаем линию
+      self.OnCmdCREATELINE(self, sReceivedMessage, id);
+      FormMain.ShowAllUserInTree(MainLine);
+      tLocalUser := GetUserInfo(GetLocalUserId());
+      if tLocalUser <> nil then
+      begin
+        //если CREATE от себя
+        if (AnsiCompareText(GetParamX(sReceivedMessage, 2, #19#19, true), LocalComputerName) <> 0) then
+          begin
+          //себе
+          SendCommConnect(PChar(tLocalUser.ProtoName),
+                          PChar(tLocalUser.NickName),
+                          PChar(LocalComputerName),
+                          PChar(GetParamX(sReceivedMessage, 4, #19#19, true)),
+                          PChar(LocalComputerName),
+                          PChar(tLocalUser.MessageStatus.Strings[Ord(tLocalUser.Status)]),
+                          Ord(tLocalUser.Status));
+          end;
+        {//удаленному компу
+        SendCommConnect(PChar(tLocalUser.NickName),
+                        PChar(GetParamX(sReceivedMessage, 2, #19#19, true)),
+                        PChar(GetParamX(sReceivedMessage, 4, #19#19, true)),
+                        '*',
+                        PChar(tLocalUser.MessageStatus.Strings[tLocalUser.Status]),
+                        tLocalUser.Status);
+        }
+        end;
+      end;
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+    ///SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'TEXT' then
+  begin
+  //iChat110ANDREYTEXTgsMTCI hiYT
+  //принята команда TEXT
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     GetParamX(sReceivedMessage, 6, #19#19, true),
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    self.OnCmdText(self, sReceivedMessage, id);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'REFRESH' then
+  begin
+  //iChat137ANDREYREFRESHiTCniaMAdminsAndreyПриветствую!*1.21b63
+  //принята команда REFRESH
+  //добавляем линию в список линий юзера
+  MainLine := FormMain.GetMainLine();
+  if MainLine <> nil then
+    begin
+    MainLineUID := MainLine.GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+    if MainLineUID <> INVALID_USER_ID then
+      begin
+      //проверяем вдруг она там уже есть
+      //messagebox(0, PChar('MainLineUID <> INVALID_USER_ID'), '' ,mb_ok);
+      s := GetParamX(sReceivedMessage, 4, #19#19, true);
+      //из-за несовершенства протокола нам надо попытаться определить
+      //REFRESH пришел от линии или от привата
+      //будем считать что если название линии только из цифр то это приват
+      //в этом случае нам надо чтобы до TLineNode.Create() не дошло!
+      For c := 1 to length(s) do
+        begin
+        if not (s[c] in ['0'..'9']) then
+          begin
+          i := 0;
+          break;
+          end
+        else
+          begin
+          i := 1;
+          end;
+        end;
+//      if i = 1 then s := '*';//специально искажаем название линии, чтобы не добавлять его
+      if (AnsiCompareText(s, '*') <> 0) and
+         (MainLine.ChatLineUsers[MainLineUID].ChatLinesList.IndexOf(s) < 0) then
+        begin
+        LineNode := TLineNode.Create(MainLine.ChatLineUsers[MainLineUID].LineName, LS_LineObjectCreated);
+        LineNode.LineName := s;
+        if i = 1 then
+          begin
+          LineNode.DisplayLineName := fmInternational.Strings[I_PRIVATE] + ' (?)';
+          LineNode.LineType := LT_PRIVATE_CHAT;
+          end
+        else
+          begin
+          LineNode.DisplayLineName := LineNode.LineName;
+          LineNode.LineType := LT_LINE;
+          end;
+        LineNode.CreatedByCommand := 'REFRESH';
+        LineNode.LineOwner := MainLine.ChatLineUsers[MainLineUID].ComputerName;
+        LineNode.LineOwnerID := MainLineUID;
+        LineNode.LineUsers.Add(LineNode.LineOwner);
+        LineNode.TimeCreate := Now();
+        LineNode.TimeOfLastMess := GetTickCount();
+        LineNode.LineID := MainLine.ChatLineUsers[MainLineUID].ChatLinesList.AddObject(s, LineNode);
+        TDebugMan.AddLine2('Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName); //FormDebug.DebugMemo2.Lines.Add('Линия ' + LineNode.LineName + ' добавлена в список линий ' + MainLine.ChatLineUsers[MainLineUID].ComputerName);
+        //FormMain.ShowUserInTree(MainLine, MainLineUID, ShowUser_REDRAW);
+        //FormMain.ShowLinesInTree(MainLine, MainLine.ChatLineUsers[MainLineUID], LineNode, ShowLine_ADD);
+        if PlaySounds then
+          SoundOnCommFindLine(integer(MainLine.LineType), PChar(sReceivedMessage), PChar(MainLine.ChatLineUsers[MainLineUID].SoundFindLine), MainLineUID);
+        FormMain.ShowAllUserInTree(MainLine);
+        end
+      else
+        begin
+        //FormMain.ShowUserInTree(MainLine, MainLineUID, ShowUser_REDRAW);
+        end;
+      end;
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+    TDebugMan.AddLine2('!!!! <-- ' + sReceivedMessage); //FormDebug.DebugMemo2.Lines.Add('!!!! <-- ' + sReceivedMessage);
+    SendDisconnectConnect(sReceivedMessage);
+    end;
+
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  if id <> INVALID_USER_ID then
+    begin
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    //ChatLineUsers[id].LastReceivedMessNumber := strtointE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    //Нельзя говорить, что это сообщение уже было пока не пройдет его обработка
+    //в OnCmdREFRESH()
+    ChatLineUsers[id].TimeLastUpdate := GetTickCount();
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    ChatLineUsers[id].Status := TDreamChatStatus(StrToIntE(GetParamX(sReceivedMessage, 11, #19#19, True)));
+    self.OnCmdREFRESH(self, sReceivedMessage, id);
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+      TDebugMan.AddLine2('!!!! <-- ' + sReceivedMessage); //FormDebug.DebugMemo2.Lines.Add('!!!! <-- ' + sReceivedMessage);
+      SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'RENAME' then
+  begin
+  //принята команда RENAME
+  //iChat287KITTYRENAMEnewnikKITTY
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeLastUpdate := GetTickCount();
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    self.OnCmdRENAME(self, sReceivedMessage, id);
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+//    SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'RECEIVED' then
+  begin
+  //iChat47DIMARECEIVEDgsMTCI. Меня нет.
+  //принята команда RECEIVED
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    self.OnCmdRECEIVED(self, sReceivedMessage, id);
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+//    SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'BOARD' then
+  begin
+  //iChat85192.168.0.5/HOME-3EGDLXBNPB/slavaBOARD0
+  //принята команда BOARD
+  id := self.GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    //внимание!!! сообщение может быть из нескольких частей!
+    DoUpdate := false;
+    MessBoardNumber := StrToIntE(GetParamX(sReceivedMessage, 4, #19#19, true));
+    if (length(GetParamX(sReceivedMessage, 5, #19#19, true)) > 0) then
+      begin
+      //если в доске объяв что-то пришло
+      if (MessBoardNumber = 0) then
+        begin
+        //у сообщения только одна часть
+        {ChatLineUsers[id].MessageBoard.Clear;
+        s := GetParamX(sReceivedMessage, 5, #19#19, true);
+        MessageBox(0, Pchar(inttostr(byte(s[length(s)- 1])) +
+                            inttostr(byte(s[length(s)]))
+                            ), '', mb_ok);}
+        ChatLineUsers[id].MessageBoard.Clear;
+        ChatLineUsers[id].MessageBoard.Text := GetParamX(sReceivedMessage, 5, #19#19, true);
+        end
+      else
+        begin
+        //у сообщения несколько частей
+        ChatLineUsers[id].MessageBoard.Text := copy(ChatLineUsers[id].MessageBoard.Text, 0, Length(ChatLineUsers[id].MessageBoard.Text) - 2) + (GetParamX(sReceivedMessage, 5, #19#19, true));
+        end;
+      ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+      ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+      end
+    else
+      begin
+      //в доске ничего не пришло! Однако, если у юзера доска висела, то надо,
+      //чтобы при обновлении она была убрана
+      if Length(ChatLineUsers[id].MessageBoard.Text) > 0 then
+        begin
+        DoUpdate := True;
+        TDebugMan.AddLine1('стрираем доску!'); //FormDebug.DebugMemo1.Lines.Add('стрираем доску!');
+        ChatLineUsers[id].MessageBoard.Clear;
+        end;
+      end;
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    //MessageBox(0, Pchar(inttostr(id)), 'OnCmdBOARD', mb_ok);
+    self.OnCmdBOARD(self, sReceivedMessage, id, DoUpdate);
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+//    SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'STATUS' then
+  begin
+  //iChat22ANDREYSTATUS0Приветствую!
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    ChatLineUsers[id].Status := TDreamChatStatus(StrToIntE(GetParamX(sReceivedMessage, 4, #19#19, True)));
+    while Ord(ChatLineUsers[id].Status) >= ChatLineUsers[id].MessageStatus.Count do
+      begin
+      ChatLineUsers[id].MessageStatus.Add('');
+      end;
+    ChatLineUsers[id].MessageStatus.Strings[Ord(ChatLineUsers[id].Status)] := GetParamX(sReceivedMessage, 5, #19#19, True);
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, True));
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    self.OnCmdSTATUS(self, sReceivedMessage, id);
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+//    SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'REFRESH_BOARD' then
+  begin
+  //iChat%d192.168.1.4/ANDREY/UserREFRESH_BOARD
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    self.OnCmdREFRESH_BOARD(self, sReceivedMessage, id);
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+//    SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'STATUS_REQ' then
+  begin
+  //iChat418SATANASTATUS_REQ
+  id := GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if id <> INVALID_USER_ID then
+    begin
+    ChatLineUsers[id].ReceivedMessCount := ChatLineUsers[id].ReceivedMessCount + 1;
+    ChatLineUsers[id].LastReceivedMessNumber := StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true));
+    ChatLineUsers[id].TimeOfLastMess := GetTickCount();
+    self.OnCmdSTATUS_REQ(self, sReceivedMessage, id);
+    end
+  else
+    begin
+    //шлем ругательства, т.к. это сообщение пришло от не законнектившегося юзера
+//    SendDisconnectConnect(sReceivedMessage);
+    end;
+  end;
+
+if GetParamX(sReceivedMessage, 3, #19#19, true) = 'DISCONNECT' then
+  begin
+  // iChat  1  ANDREY  DISCONNECT  iTCniaM 
+  //получаем id ушедшего узера
+  id := self.GetUserIdByCompName(GetParamX(sReceivedMessage, 2, #19#19, true));
+  //id := GetUserIdByCompNameAndNickName(GetParamX(sReceivedMessage, 2, #19#19, true),
+  //                                     '',
+  //                                     StrToIntE(GetParamX(sReceivedMessage, 1, #19#19, true)));
+  if (Self.ChatLineName = TDreamChatDefaults.MainChatLineName {'iTCniaM'}) and (id = Self.GetLocalUserId()) and
+    (Closing <> true) and (Initing <> true) then
+    begin
+    //что тут у нас? Закрытия чата не происходит, стадия инициализации завершена,
+    //однако пришла команда на отключение локального пользователя из главной линии!
+    //Кто-то нас ломает!!!!
+    TDebugMan.AddLine2('Внимание! Кто-то пытается выбить локального пользователя из чата командой ''DISCONNECT''!'); //FormDebug.DebugMemo2.Lines.Add('Внимание! Кто-то пытается выбить локального пользователя из чата командой ''DISCONNECT''!');
+    id := INVALID_USER_ID;
+    end;
+  if Initing = true then Initing := false;//инициализация завершена
+  if (id <> INVALID_USER_ID) then
+    begin
+    //такая вот проблемка нужно, чтобы пустые линии исчезали...
+    //а при /close команда идет в ITCIAM
+    MainLine := FormMain.GetMainLine();
+    if MainLine <> nil then
+      //надежность прежде вcего :-))
+      begin
+      if (self.ChatLineName <> TDreamChatDefaults.MainChatLineName {'iTCniaM'}) or
+        (
+        (self.ChatLineName = TDreamChatDefaults.MainChatLineName {'iTCniaM'}) and
+        (GetParamX(sReceivedMessage, 4, #19#19, True) <> TDreamChatDefaults.MainChatLineName {'iTCniaM'})
+        ) then
+        //возможны 2а случая:
+        //1. если это был выход из личного чата или линии (т.е. сообщение пришло не
+        //в главную линию)
+        //2. если я уже закрыл приват, объект-линия этого привата была уничтожена,
+        //а 2й участник привата решил его закрыть через 5 мин, то его сообщение
+        //DISCONNECT уже не существующей линии свалилося в 'iTCniaM'.
+        //В этом случае нам просто нужно убрать плюсик линий у этого юзера в дереве.
+        begin
+        //то убираем эту линию/чат из списка линий этого юзера
+        //получаем ID этого юзера в главной линии (в привате у юзера другой ID)
+        //траблы...
+        MainLineUId := MainLine.GetUserIdByCompName(self.ChatLineUsers[id].ComputerName);
+        if MainLineUId <> INVALID_USER_ID then
+          begin
+          //c := MainLine.ChatLineUsers[MainLineUId].ChatLinesList.IndexOf(тут ошибка! self.ChatLineName);
+          TDebugMan.AddLine2('Ищем линию ' + GetParamX(sReceivedMessage, 4, #19#19, true) + ' которую покинул юзер ' + self.ChatLineUsers[id].DisplayNickName + ' в его списке линий...'); //FormDebug.DebugMemo2.Lines.Add('Ищем линию ' + GetParamX(sReceivedMessage, 4, #19#19, true) + ' которую покинул юзер ' + self.ChatLineUsers[id].DisplayNickName + ' в его списке линий...');
+          if MainLine.ChatLineUsers[MainLineUId].ChatLinesList.Count > 0 then
+            begin
+            i := MainLine.ChatLineUsers[MainLineUId].ChatLinesList.IndexOf(GetParamX(sReceivedMessage, 4, #19#19, true));
+            if i >= 0 then
+              begin
+              if MainLine.ChatLineUsers[MainLineUId].ChatLinesList.Objects[i] <> nil then
+                begin
+                //FormMain.ShowLinesInTree(MainLine, MainLine.ChatLineUsers[MainLineUId],
+                //                      TLineNode(MainLine.ChatLineUsers[MainLineUId].ChatLinesList.objects[i]),
+                //                      ShowLine_DELETE);//обновлять не надо, обновиться в OnCmdDisconnect()
+                MainLine.ChatLineUsers[MainLineUId].ChatLinesList.Objects[i].free;
+                end;
+              MainLine.ChatLineUsers[MainLineUId].ChatLinesList.Delete(i);
+              //надо найти узел-линию у этого пользователя и убрать у него из
+              //обнулить указатель на LineNode у PDNode.
+              {Эта процедура должна быть в обновлении узла, когда дерево будет
+              отрисовываться по одному узлу, а не целиком как сейчас
+              While перечисляем себе подузлы узла юзер
+              PDNode := Line.ChatLineTree.GetNodeData(VirtualNode);
+              }
+              FormMain.ShowAllUserInTree(MainLine);
+              TDebugMan.AddLine2('Линия была удалена из его LinesList.'); //FormDebug.DebugMemo2.Lines.Add('Линия была удалена из его LinesList.');
+              end
+            else
+              begin
+              TDebugMan.AddLine2('Линия не найдена.'); //FormDebug.DebugMemo2.Lines.Add('Линия не найдена.');
+              end;
+            end
+          else
+            begin
+            TDebugMan.AddLine2('У пользователя нет линий.'); //FormDebug.DebugMemo2.Lines.Add('У пользователя нет линий.');
+            end;
+          end;
+        end;
+      end;
+
+    //если этот юзер был отмечен галочками - снимаем отметки
+    i := UserListCNS_Private.IndexOf(ChatLineUsers[id].ComputerName);
+    if i >= 0 then UserListCNS_Private.Delete(i);
+    i := UserListCNS_Personal.IndexOf(ChatLineUsers[id].ComputerName);
+    if i >= 0 then UserListCNS_Personal.Delete(i);
+
+    if (AnsiCompareText(self.ChatLineName, GetParamX(sReceivedMessage, 4, #19#19, true)) = 0) then
+      begin
+      FormMain.ParseAllChatView(fmInternational.Strings[I_USERDISCONNECTED] + ' ' + ChatLineUsers[id].DisplayNickName +
+                             ' [' + GetParamX(sReceivedMessage, 2, #19#19, true) +']',
+                             self, FormMain.CVStyle1.TextStyles.Items[SYSTEMTEXTSTYLE],
+                             nil, nil, false, true);
+      //FormMain.ShowUserInTree(self, id, ShowUser_DELETE);
+      //FormMain.ShowAllUserInTree(self);
+      //MessageBox(0, PChar(''), PChar(inttostr(id)) ,mb_ok);
+      if id = UsersCount - 1 then
+        begin
+        //если юзер имеет последний номер в массиве, то двигать цепочку не надо!
+        //просто его удалить!
+        //messagebox(0, PChar(inttostr(id)), ' убит' ,mb_ok);
+        if PlaySounds then
+          SoundOnCommDisconnect(integer(Self.LineType), PChar(sReceivedMessage), PChar(ChatLineUsers[id].SoundDisconnect), ID);
+        TChatUser(ChatLineUsers[id]).Free;
+       // UsersCount := UsersCount - 1;
+        SetLength(ChatLineUsers, UsersCount - 1);
+        end
+      else
+        begin
+        //номер юзера не последний! за ним есть еще юзеры!
+        //передвигаем последнего юзера на освободившееся место
+        //messagebox(0, PChar(inttostr(UsersCount - 1) + ' => ' + inttostr(id)), 'передвигаем последнего юзера на освободивщееся место' ,mb_ok);
+        if PlaySounds then
+          SoundOnCommDisconnect(integer(Self.LineType), PChar(sReceivedMessage), PChar(ChatLineUsers[id].SoundDisconnect), ID);
+        TChatUser(ChatLineUsers[id]).Free;
+        //ChatLineUsers[id].Assign(ChatLineUsers[UsersCount - 1]);//UsersCount - 1 => id
+        ChatLineUsers[id] := ChatLineUsers[UsersCount - 1];//UsersCount - 1 => id
+
+//        ChatLineUsers[id].UserID := id;//не забываем сказать юзеру, что у него изменился id!!!
+        self.FChatLineTree.FocusedNode := ChatLineUsers[id].VirtualNode;
+        PDNode := self.ChatLineTree.GetNodeData(ChatLineUsers[id].VirtualNode);
+        //TChatUser(ChatLineUsers[UsersCount - 1]).Free;//стал id, а копию UsersCount - 1 убиваем
+       // UsersCount := UsersCount - 1;
+        SetLength(ChatLineUsers, UsersCount - 1);
+        //messagebox(0, PChar(inttostr(UsersCount)), 'юзер передвинут, всего теперь:' ,mb_ok);
+
+        //возможно из чата ушел чел с "конфликтным именем" и нужно просмотреть всех
+        //юзеров, чтобы вернуть им их имена
+        for c := 0 to self.UsersCount - 1 do
+          begin
+          if AnsiCompareText(self.ChatLineUsers[c].DisplayNickName, self.ChatLineUsers[c].NickName) <> 0 then
+            self.ChatLineUsers[c].DisplayNickName := Self.GetUniqueNickName(self.ChatLineUsers[c].UserID);
+          end;
+        //FormMain.ShowAllUserInTree(Self);//обновлять не надо, обновиться в OnCmdDisconnect()
+        //FormMain.ShowAllUserInTree(FormMain.GetMainLine);//обновлять не надо, обновиться в OnCmdDisconnect()
+        end;
+      //внимание! возвращаем id уже не существующего юзера!
+      //по этому id щас будет уже или другой юзер или пустота!
+      end;
+
+    //если челов не осталось, то линия сама уничтожиться в обработчике OnCmdDisconnect()
+    self.OnCmdDisconnect(self, sReceivedMessage, INVALID_USER_ID{id});
+    end;
+  end;
+END;
+
+end.

@@ -1,0 +1,10 @@
+object Panel4: TsPanel
+  Constraints.MinHeight = 0
+  Left = 1
+  Top = 1
+  Width = 533
+  Height = 268
+  Align = alClient
+  BevelOuter = bvNone
+  TabOrder = 1
+end
