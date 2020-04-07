@@ -1,0 +1,1035 @@
+Version   : 6.0.11
+Date      : Mon, 3 Sep 2012 15:17:20 +0400
+OS        : Microsoft Windows XP
+RAD       : Delphi 7.0
+Dump      : $F3 $A5 $89 $C1 $83 $E1 $03 $F3 $A4 $5F $5E $C3 $8D $74 $31 $FC $8D $7C $39 $FC $C1 $F9 $02 $78 $11 $FD $F3 $A5 $89 $C1 $83 $E1 
+Section   : ExceptionLog.Init (Address: 05659E30)
+LastExcept: 
+Address   : $055F2D67 - [055F0000] TestPlugin2.dll -  -  -  - 0[0]
+Exception : EAccessViolation
+Message   : Access violation at address 055F2D67 in module 'TestPlugin2.dll'. Read of address 05A08974
+Call Stack: 00 $055F2D54 - [055F0000] TestPlugin2.dll 
+            01 $05606BC2 - [055F0000] TestPlugin2.dll 
+            02 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            03 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            04 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            05 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            06 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            07 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            08 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            09 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            0A $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            0B $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            0C $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            0D $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            0E $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            0F $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            10 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            11 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            12 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            13 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            14 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            15 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            16 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            17 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            18 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            19 $055F4183 - [055F0000] TestPlugin2.dll 
+            1A $7C9032A6 - [7C900000] ntdll.dll 
+            1B $7C903282 - [7C900000] ntdll.dll 
+            1C $7C903275 - [7C900000] ntdll.dll 
+            1D $7C903247 - [7C900000] ntdll.dll 
+            1E $7C92A8BE - [7C900000] ntdll.dll 
+            1F $7C90E906 - [7C900000] ntdll.dll 
+            20 $7C9705BF - [7C900000] ntdll.dll 
+            21 $7C9703BF - [7C900000] ntdll.dll 
+            22 $7C94BAF7 - [7C900000] ntdll.dll 
+            23 $7C90E906 - [7C900000] ntdll.dll 
+            24 $7C91A3C6 - [7C900000] ntdll.dll 
+            25 $7C92A824 - [7C900000] ntdll.dll 
+            26 $7C90E485 - [7C900000] ntdll.dll 
+            27 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            28 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            29 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            2A $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            2B $77DC7852 - [77DC0000] advapi32.dll 
+            2C $77DCEFF1 - [77DC0000] advapi32.dll 
+            2D $055F2D54 - [055F0000] TestPlugin2.dll 
+            2E $05606BC2 - [055F0000] TestPlugin2.dll 
+            2F $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            30 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            31 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            32 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            33 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            34 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            35 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            36 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            37 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            38 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            39 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            3A $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            3B $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            3C $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            3D $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            3E $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            3F $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            40 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            41 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            42 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            43 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            44 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            45 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            46 $055F4183 - [055F0000] TestPlugin2.dll 
+            47 $7C9032A6 - [7C900000] ntdll.dll 
+            48 $7C903282 - [7C900000] ntdll.dll 
+            49 $7C903275 - [7C900000] ntdll.dll 
+            4A $7C903247 - [7C900000] ntdll.dll 
+            4B $7C92A8BE - [7C900000] ntdll.dll 
+            4C $7C90E906 - [7C900000] ntdll.dll 
+            4D $7C9705BF - [7C900000] ntdll.dll 
+            4E $7C9703BF - [7C900000] ntdll.dll 
+            4F $7C94BAF7 - [7C900000] ntdll.dll 
+            50 $7C90E906 - [7C900000] ntdll.dll 
+            51 $7C91A3C6 - [7C900000] ntdll.dll 
+            52 $7C92A824 - [7C900000] ntdll.dll 
+            53 $7C90E485 - [7C900000] ntdll.dll 
+            54 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            55 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            56 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            57 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            58 $77DC7852 - [77DC0000] advapi32.dll 
+            59 $77DCEFF1 - [77DC0000] advapi32.dll 
+            5A $055F2D54 - [055F0000] TestPlugin2.dll 
+            5B $05606BC2 - [055F0000] TestPlugin2.dll 
+            5C $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            5D $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            5E $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            5F $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            60 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            61 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            62 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            63 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            64 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            65 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            66 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            67 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            68 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            69 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            6A $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            6B $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            6C $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            6D $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            6E $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            6F $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            70 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            71 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            72 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            73 $055F4183 - [055F0000] TestPlugin2.dll 
+            74 $7C9032A6 - [7C900000] ntdll.dll 
+            75 $7C903282 - [7C900000] ntdll.dll 
+            76 $7C903275 - [7C900000] ntdll.dll 
+            77 $7C903247 - [7C900000] ntdll.dll 
+            78 $7C92A8BE - [7C900000] ntdll.dll 
+            79 $7C90E906 - [7C900000] ntdll.dll 
+            7A $7C9705BF - [7C900000] ntdll.dll 
+            7B $7C9703BF - [7C900000] ntdll.dll 
+            7C $7C94BAF7 - [7C900000] ntdll.dll 
+            7D $7C90E906 - [7C900000] ntdll.dll 
+            7E $7C91A3C6 - [7C900000] ntdll.dll 
+            7F $7C92A824 - [7C900000] ntdll.dll 
+            80 $7C90E485 - [7C900000] ntdll.dll 
+            81 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            82 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            83 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            84 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            85 $77DC7852 - [77DC0000] advapi32.dll 
+            86 $77DCEFF1 - [77DC0000] advapi32.dll 
+            87 $055F2D54 - [055F0000] TestPlugin2.dll 
+            88 $05606BC2 - [055F0000] TestPlugin2.dll 
+            89 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            8A $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            8B $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            8C $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            8D $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            8E $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            8F $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            90 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            91 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            92 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            93 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            94 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            95 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            96 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            97 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            98 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            99 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            9A $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            9B $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            9C $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            9D $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            9E $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            9F $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            A0 $055F4183 - [055F0000] TestPlugin2.dll 
+            A1 $7C9032A6 - [7C900000] ntdll.dll 
+            A2 $7C903282 - [7C900000] ntdll.dll 
+            A3 $7C903275 - [7C900000] ntdll.dll 
+            A4 $7C903247 - [7C900000] ntdll.dll 
+            A5 $7C92A8BE - [7C900000] ntdll.dll 
+            A6 $7C90E906 - [7C900000] ntdll.dll 
+            A7 $7C9705BF - [7C900000] ntdll.dll 
+            A8 $7C9703BF - [7C900000] ntdll.dll 
+            A9 $7C94BAF7 - [7C900000] ntdll.dll 
+            AA $7C90E906 - [7C900000] ntdll.dll 
+            AB $7C91A3C6 - [7C900000] ntdll.dll 
+            AC $7C92A824 - [7C900000] ntdll.dll 
+            AD $7C90E485 - [7C900000] ntdll.dll 
+            AE $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            AF $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            B0 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            B1 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            B2 $77DC7852 - [77DC0000] advapi32.dll 
+            B3 $77DCEFF1 - [77DC0000] advapi32.dll 
+            B4 $055F2D54 - [055F0000] TestPlugin2.dll 
+            B5 $05606BC2 - [055F0000] TestPlugin2.dll 
+            B6 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            B7 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            B8 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            B9 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            BA $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            BB $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            BC $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            BD $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            BE $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            BF $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            C0 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            C1 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            C2 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            C3 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            C4 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            C5 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            C6 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            C7 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            C8 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            C9 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            CA $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            CB $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            CC $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            CD $055F4183 - [055F0000] TestPlugin2.dll 
+            CE $7C9032A6 - [7C900000] ntdll.dll 
+            CF $7C903282 - [7C900000] ntdll.dll 
+            D0 $7C903275 - [7C900000] ntdll.dll 
+            D1 $7C903247 - [7C900000] ntdll.dll 
+            D2 $7C92A8BE - [7C900000] ntdll.dll 
+            D3 $7C90E906 - [7C900000] ntdll.dll 
+            D4 $7C9705BF - [7C900000] ntdll.dll 
+            D5 $7C9703BF - [7C900000] ntdll.dll 
+            D6 $7C94BAF7 - [7C900000] ntdll.dll 
+            D7 $7C90E906 - [7C900000] ntdll.dll 
+            D8 $7C91A3C6 - [7C900000] ntdll.dll 
+            D9 $7C92A824 - [7C900000] ntdll.dll 
+            DA $7C90E485 - [7C900000] ntdll.dll 
+            DB $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            DC $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            DD $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            DE $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            DF $77DC7852 - [77DC0000] advapi32.dll 
+            E0 $77DCEFF1 - [77DC0000] advapi32.dll 
+            E1 $055F2D54 - [055F0000] TestPlugin2.dll 
+            E2 $05606BC2 - [055F0000] TestPlugin2.dll 
+            E3 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            E4 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            E5 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            E6 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            E7 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            E8 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            E9 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            EA $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            EB $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            EC $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            ED $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            EE $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            EF $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            F0 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            F1 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            F2 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            F3 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            F4 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            F5 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            F6 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            F7 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            F8 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            F9 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            FA $055F4183 - [055F0000] TestPlugin2.dll 
+            FB $7C9032A6 - [7C900000] ntdll.dll 
+            FC $7C903282 - [7C900000] ntdll.dll 
+            FD $7C903275 - [7C900000] ntdll.dll 
+            FE $7C903247 - [7C900000] ntdll.dll 
+            FF $7C92A8BE - [7C900000] ntdll.dll 
+            100 $7C90E906 - [7C900000] ntdll.dll 
+            101 $7C9705BF - [7C900000] ntdll.dll 
+            102 $7C9703BF - [7C900000] ntdll.dll 
+            103 $7C94BAF7 - [7C900000] ntdll.dll 
+            104 $7C90E906 - [7C900000] ntdll.dll 
+            105 $7C91A3C6 - [7C900000] ntdll.dll 
+            106 $7C92A824 - [7C900000] ntdll.dll 
+            107 $7C90E485 - [7C900000] ntdll.dll 
+            108 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            109 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            10A $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            10B $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            10C $77DC7852 - [77DC0000] advapi32.dll 
+            10D $77DCEFF1 - [77DC0000] advapi32.dll 
+            10E $055F2D54 - [055F0000] TestPlugin2.dll 
+            10F $05606BC2 - [055F0000] TestPlugin2.dll 
+            110 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            111 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            112 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            113 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            114 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            115 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            116 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            117 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            118 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            119 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            11A $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            11B $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            11C $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            11D $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            11E $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            11F $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            120 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            121 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            122 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            123 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            124 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            125 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            126 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            127 $055F4183 - [055F0000] TestPlugin2.dll 
+            128 $7C9032A6 - [7C900000] ntdll.dll 
+            129 $7C903282 - [7C900000] ntdll.dll 
+            12A $7C903275 - [7C900000] ntdll.dll 
+            12B $7C903247 - [7C900000] ntdll.dll 
+            12C $7C92A8BE - [7C900000] ntdll.dll 
+            12D $7C90E906 - [7C900000] ntdll.dll 
+            12E $7C9705BF - [7C900000] ntdll.dll 
+            12F $7C9703BF - [7C900000] ntdll.dll 
+            130 $7C94BAF7 - [7C900000] ntdll.dll 
+            131 $7C90E906 - [7C900000] ntdll.dll 
+            132 $7C91A3C6 - [7C900000] ntdll.dll 
+            133 $7C92A824 - [7C900000] ntdll.dll 
+            134 $7C90E485 - [7C900000] ntdll.dll 
+            135 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            136 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            137 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            138 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            139 $77DC7852 - [77DC0000] advapi32.dll 
+            13A $77DCEFF1 - [77DC0000] advapi32.dll 
+            13B $055F2D54 - [055F0000] TestPlugin2.dll 
+            13C $05606BC2 - [055F0000] TestPlugin2.dll 
+            13D $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            13E $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            13F $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            140 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            141 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            142 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            143 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            144 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            145 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            146 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            147 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            148 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            149 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            14A $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            14B $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            14C $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            14D $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            14E $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            14F $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            150 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            151 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            152 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            153 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            154 $055F4183 - [055F0000] TestPlugin2.dll 
+            155 $7C9032A6 - [7C900000] ntdll.dll 
+            156 $7C903282 - [7C900000] ntdll.dll 
+            157 $7C903275 - [7C900000] ntdll.dll 
+            158 $7C903247 - [7C900000] ntdll.dll 
+            159 $7C92A8BE - [7C900000] ntdll.dll 
+            15A $7C90E906 - [7C900000] ntdll.dll 
+            15B $7C9705BF - [7C900000] ntdll.dll 
+            15C $7C9703BF - [7C900000] ntdll.dll 
+            15D $7C94BAF7 - [7C900000] ntdll.dll 
+            15E $7C90E906 - [7C900000] ntdll.dll 
+            15F $7C91A3C6 - [7C900000] ntdll.dll 
+            160 $7C92A824 - [7C900000] ntdll.dll 
+            161 $7C90E485 - [7C900000] ntdll.dll 
+            162 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            163 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            164 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            165 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            166 $77DC7852 - [77DC0000] advapi32.dll 
+            167 $77DCEFF1 - [77DC0000] advapi32.dll 
+            168 $055F2D54 - [055F0000] TestPlugin2.dll 
+            169 $05606BC2 - [055F0000] TestPlugin2.dll 
+            16A $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            16B $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            16C $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            16D $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            16E $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            16F $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            170 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            171 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            172 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            173 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            174 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            175 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            176 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            177 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            178 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            179 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            17A $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            17B $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            17C $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            17D $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            17E $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            17F $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            180 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            181 $055F4183 - [055F0000] TestPlugin2.dll 
+            182 $7C9032A6 - [7C900000] ntdll.dll 
+            183 $7C903282 - [7C900000] ntdll.dll 
+            184 $7C903275 - [7C900000] ntdll.dll 
+            185 $7C903247 - [7C900000] ntdll.dll 
+            186 $7C92A8BE - [7C900000] ntdll.dll 
+            187 $7C90E906 - [7C900000] ntdll.dll 
+            188 $7C9705BF - [7C900000] ntdll.dll 
+            189 $7C9703BF - [7C900000] ntdll.dll 
+            18A $7C94BAF7 - [7C900000] ntdll.dll 
+            18B $7C90E906 - [7C900000] ntdll.dll 
+            18C $7C91A3C6 - [7C900000] ntdll.dll 
+            18D $7C92A824 - [7C900000] ntdll.dll 
+            18E $7C90E485 - [7C900000] ntdll.dll 
+            18F $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            190 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            191 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            192 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            193 $77DC7852 - [77DC0000] advapi32.dll 
+            194 $77DCEFF1 - [77DC0000] advapi32.dll 
+            195 $055F2D54 - [055F0000] TestPlugin2.dll 
+            196 $05606BC2 - [055F0000] TestPlugin2.dll 
+            197 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            198 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            199 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            19A $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            19B $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            19C $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            19D $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            19E $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            19F $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            1A0 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            1A1 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            1A2 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            1A3 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            1A4 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            1A5 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            1A6 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            1A7 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            1A8 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            1A9 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            1AA $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            1AB $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            1AC $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            1AD $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            1AE $055F4183 - [055F0000] TestPlugin2.dll 
+            1AF $7C9032A6 - [7C900000] ntdll.dll 
+            1B0 $7C903282 - [7C900000] ntdll.dll 
+            1B1 $7C903275 - [7C900000] ntdll.dll 
+            1B2 $7C903247 - [7C900000] ntdll.dll 
+            1B3 $7C92A8BE - [7C900000] ntdll.dll 
+            1B4 $7C90E906 - [7C900000] ntdll.dll 
+            1B5 $7C9705BF - [7C900000] ntdll.dll 
+            1B6 $7C9703BF - [7C900000] ntdll.dll 
+            1B7 $7C94BAF7 - [7C900000] ntdll.dll 
+            1B8 $7C90E906 - [7C900000] ntdll.dll 
+            1B9 $7C91A3C6 - [7C900000] ntdll.dll 
+            1BA $7C92A824 - [7C900000] ntdll.dll 
+            1BB $7C90E485 - [7C900000] ntdll.dll 
+            1BC $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            1BD $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            1BE $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            1BF $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            1C0 $77DC7852 - [77DC0000] advapi32.dll 
+            1C1 $77DCEFF1 - [77DC0000] advapi32.dll 
+            1C2 $055F2D54 - [055F0000] TestPlugin2.dll 
+            1C3 $05606BC2 - [055F0000] TestPlugin2.dll 
+            1C4 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            1C5 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            1C6 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            1C7 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            1C8 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            1C9 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            1CA $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            1CB $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            1CC $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            1CD $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            1CE $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            1CF $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            1D0 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            1D1 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            1D2 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            1D3 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            1D4 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            1D5 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            1D6 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            1D7 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            1D8 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            1D9 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            1DA $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            1DB $055F4183 - [055F0000] TestPlugin2.dll 
+            1DC $7C9032A6 - [7C900000] ntdll.dll 
+            1DD $7C903282 - [7C900000] ntdll.dll 
+            1DE $7C903275 - [7C900000] ntdll.dll 
+            1DF $7C903247 - [7C900000] ntdll.dll 
+            1E0 $7C92A8BE - [7C900000] ntdll.dll 
+            1E1 $7C90E906 - [7C900000] ntdll.dll 
+            1E2 $7C9705BF - [7C900000] ntdll.dll 
+            1E3 $7C9703BF - [7C900000] ntdll.dll 
+            1E4 $7C94BAF7 - [7C900000] ntdll.dll 
+            1E5 $7C90E906 - [7C900000] ntdll.dll 
+            1E6 $7C91A3C6 - [7C900000] ntdll.dll 
+            1E7 $7C92A824 - [7C900000] ntdll.dll 
+            1E8 $7C90E485 - [7C900000] ntdll.dll 
+            1E9 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            1EA $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            1EB $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            1EC $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            1ED $77DC7852 - [77DC0000] advapi32.dll 
+            1EE $77DCEFF1 - [77DC0000] advapi32.dll 
+            1EF $055F2D54 - [055F0000] TestPlugin2.dll 
+            1F0 $05606BC2 - [055F0000] TestPlugin2.dll 
+            1F1 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            1F2 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            1F3 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            1F4 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            1F5 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            1F6 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            1F7 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            1F8 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            1F9 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            1FA $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            1FB $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            1FC $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            1FD $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            1FE $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            1FF $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            200 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            201 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            202 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            203 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            204 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            205 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            206 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            207 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            208 $055F4183 - [055F0000] TestPlugin2.dll 
+            209 $7C9032A6 - [7C900000] ntdll.dll 
+            20A $7C903282 - [7C900000] ntdll.dll 
+            20B $7C903275 - [7C900000] ntdll.dll 
+            20C $7C903247 - [7C900000] ntdll.dll 
+            20D $7C92A8BE - [7C900000] ntdll.dll 
+            20E $7C90E906 - [7C900000] ntdll.dll 
+            20F $7C9705BF - [7C900000] ntdll.dll 
+            210 $7C9703BF - [7C900000] ntdll.dll 
+            211 $7C94BAF7 - [7C900000] ntdll.dll 
+            212 $7C90E906 - [7C900000] ntdll.dll 
+            213 $7C91A3C6 - [7C900000] ntdll.dll 
+            214 $7C92A824 - [7C900000] ntdll.dll 
+            215 $7C90E485 - [7C900000] ntdll.dll 
+            216 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            217 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            218 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            219 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            21A $77DC7852 - [77DC0000] advapi32.dll 
+            21B $77DCEFF1 - [77DC0000] advapi32.dll 
+            21C $055F2D54 - [055F0000] TestPlugin2.dll 
+            21D $05606BC2 - [055F0000] TestPlugin2.dll 
+            21E $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            21F $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            220 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            221 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            222 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            223 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            224 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            225 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            226 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            227 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            228 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            229 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            22A $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            22B $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            22C $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            22D $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            22E $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            22F $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            230 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            231 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            232 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            233 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            234 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            235 $055F4183 - [055F0000] TestPlugin2.dll 
+            236 $7C9032A6 - [7C900000] ntdll.dll 
+            237 $7C903282 - [7C900000] ntdll.dll 
+            238 $7C903275 - [7C900000] ntdll.dll 
+            239 $7C903247 - [7C900000] ntdll.dll 
+            23A $7C92A8BE - [7C900000] ntdll.dll 
+            23B $7C90E906 - [7C900000] ntdll.dll 
+            23C $7C9705BF - [7C900000] ntdll.dll 
+            23D $7C9703BF - [7C900000] ntdll.dll 
+            23E $7C94BAF7 - [7C900000] ntdll.dll 
+            23F $7C90E906 - [7C900000] ntdll.dll 
+            240 $7C91A3C6 - [7C900000] ntdll.dll 
+            241 $7C92A824 - [7C900000] ntdll.dll 
+            242 $7C90E485 - [7C900000] ntdll.dll 
+            243 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            244 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            245 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            246 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            247 $77DC7852 - [77DC0000] advapi32.dll 
+            248 $77DCEFF1 - [77DC0000] advapi32.dll 
+            249 $055F2D54 - [055F0000] TestPlugin2.dll 
+            24A $05606BC2 - [055F0000] TestPlugin2.dll 
+            24B $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            24C $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            24D $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            24E $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            24F $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            250 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            251 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            252 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            253 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            254 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            255 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            256 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            257 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            258 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            259 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            25A $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            25B $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            25C $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            25D $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            25E $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            25F $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            260 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            261 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            262 $055F4183 - [055F0000] TestPlugin2.dll 
+            263 $7C9032A6 - [7C900000] ntdll.dll 
+            264 $7C903282 - [7C900000] ntdll.dll 
+            265 $7C903275 - [7C900000] ntdll.dll 
+            266 $7C903247 - [7C900000] ntdll.dll 
+            267 $7C92A8BE - [7C900000] ntdll.dll 
+            268 $7C90E906 - [7C900000] ntdll.dll 
+            269 $7C9705BF - [7C900000] ntdll.dll 
+            26A $7C9703BF - [7C900000] ntdll.dll 
+            26B $7C94BAF7 - [7C900000] ntdll.dll 
+            26C $7C90E906 - [7C900000] ntdll.dll 
+            26D $7C91A3C6 - [7C900000] ntdll.dll 
+            26E $7C92A824 - [7C900000] ntdll.dll 
+            26F $7C90E485 - [7C900000] ntdll.dll 
+            270 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            271 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            272 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            273 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            274 $77DC7852 - [77DC0000] advapi32.dll 
+            275 $77DCEFF1 - [77DC0000] advapi32.dll 
+            276 $055F2D54 - [055F0000] TestPlugin2.dll 
+            277 $05606BC2 - [055F0000] TestPlugin2.dll 
+            278 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            279 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            27A $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            27B $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            27C $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            27D $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            27E $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            27F $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            280 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            281 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            282 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            283 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            284 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            285 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            286 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            287 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            288 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            289 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            28A $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            28B $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            28C $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            28D $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            28E $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            28F $055F4183 - [055F0000] TestPlugin2.dll 
+            290 $7C9032A6 - [7C900000] ntdll.dll 
+            291 $7C903282 - [7C900000] ntdll.dll 
+            292 $7C903275 - [7C900000] ntdll.dll 
+            293 $7C903247 - [7C900000] ntdll.dll 
+            294 $7C92A8BE - [7C900000] ntdll.dll 
+            295 $7C90E906 - [7C900000] ntdll.dll 
+            296 $7C9705BF - [7C900000] ntdll.dll 
+            297 $7C9703BF - [7C900000] ntdll.dll 
+            298 $7C94BAF7 - [7C900000] ntdll.dll 
+            299 $7C90E906 - [7C900000] ntdll.dll 
+            29A $7C91A3C6 - [7C900000] ntdll.dll 
+            29B $7C92A824 - [7C900000] ntdll.dll 
+            29C $7C90E485 - [7C900000] ntdll.dll 
+            29D $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            29E $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            29F $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            2A0 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            2A1 $77DC7852 - [77DC0000] advapi32.dll 
+            2A2 $77DCEFF1 - [77DC0000] advapi32.dll 
+            2A3 $055F2D54 - [055F0000] TestPlugin2.dll 
+            2A4 $05606BC2 - [055F0000] TestPlugin2.dll 
+            2A5 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            2A6 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            2A7 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            2A8 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            2A9 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            2AA $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            2AB $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            2AC $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            2AD $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            2AE $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            2AF $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            2B0 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            2B1 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            2B2 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            2B3 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            2B4 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            2B5 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            2B6 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            2B7 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            2B8 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            2B9 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            2BA $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            2BB $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            2BC $055F4183 - [055F0000] TestPlugin2.dll 
+            2BD $7C9032A6 - [7C900000] ntdll.dll 
+            2BE $7C903282 - [7C900000] ntdll.dll 
+            2BF $7C903275 - [7C900000] ntdll.dll 
+            2C0 $7C903247 - [7C900000] ntdll.dll 
+            2C1 $7C92A8BE - [7C900000] ntdll.dll 
+            2C2 $7C90E906 - [7C900000] ntdll.dll 
+            2C3 $7C9705BF - [7C900000] ntdll.dll 
+            2C4 $7C9703BF - [7C900000] ntdll.dll 
+            2C5 $7C94BAF7 - [7C900000] ntdll.dll 
+            2C6 $7C90E906 - [7C900000] ntdll.dll 
+            2C7 $7C91A3C6 - [7C900000] ntdll.dll 
+            2C8 $7C92A824 - [7C900000] ntdll.dll 
+            2C9 $7C90E485 - [7C900000] ntdll.dll 
+            2CA $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            2CB $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            2CC $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            2CD $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            2CE $77DC7852 - [77DC0000] advapi32.dll 
+            2CF $77DCEFF1 - [77DC0000] advapi32.dll 
+            2D0 $055F2D54 - [055F0000] TestPlugin2.dll 
+            2D1 $05606BC2 - [055F0000] TestPlugin2.dll 
+            2D2 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            2D3 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            2D4 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            2D5 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            2D6 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            2D7 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            2D8 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            2D9 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            2DA $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            2DB $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            2DC $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            2DD $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            2DE $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            2DF $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            2E0 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            2E1 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            2E2 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            2E3 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            2E4 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            2E5 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            2E6 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            2E7 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            2E8 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            2E9 $055F4183 - [055F0000] TestPlugin2.dll 
+            2EA $7C9032A6 - [7C900000] ntdll.dll 
+            2EB $7C903282 - [7C900000] ntdll.dll 
+            2EC $7C903275 - [7C900000] ntdll.dll 
+            2ED $7C903247 - [7C900000] ntdll.dll 
+            2EE $7C92A8BE - [7C900000] ntdll.dll 
+            2EF $7C90E906 - [7C900000] ntdll.dll 
+            2F0 $7C9705BF - [7C900000] ntdll.dll 
+            2F1 $7C9703BF - [7C900000] ntdll.dll 
+            2F2 $7C94BAF7 - [7C900000] ntdll.dll 
+            2F3 $7C90E906 - [7C900000] ntdll.dll 
+            2F4 $7C91A3C6 - [7C900000] ntdll.dll 
+            2F5 $7C92A824 - [7C900000] ntdll.dll 
+            2F6 $7C90E485 - [7C900000] ntdll.dll 
+            2F7 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            2F8 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            2F9 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            2FA $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            2FB $77DC7852 - [77DC0000] advapi32.dll 
+            2FC $77DCEFF1 - [77DC0000] advapi32.dll 
+            2FD $055F2D54 - [055F0000] TestPlugin2.dll 
+            2FE $05606BC2 - [055F0000] TestPlugin2.dll 
+            2FF $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            300 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            301 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            302 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            303 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            304 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            305 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            306 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            307 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            308 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            309 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            30A $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            30B $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            30C $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            30D $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            30E $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            30F $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            310 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            311 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            312 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            313 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            314 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            315 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            316 $055F4183 - [055F0000] TestPlugin2.dll 
+            317 $7C9032A6 - [7C900000] ntdll.dll 
+            318 $7C903282 - [7C900000] ntdll.dll 
+            319 $7C903275 - [7C900000] ntdll.dll 
+            31A $7C903247 - [7C900000] ntdll.dll 
+            31B $7C92A8BE - [7C900000] ntdll.dll 
+            31C $7C90E906 - [7C900000] ntdll.dll 
+            31D $7C9705BF - [7C900000] ntdll.dll 
+            31E $7C9703BF - [7C900000] ntdll.dll 
+            31F $7C94BAF7 - [7C900000] ntdll.dll 
+            320 $7C90E906 - [7C900000] ntdll.dll 
+            321 $7C91A3C6 - [7C900000] ntdll.dll 
+            322 $7C92A824 - [7C900000] ntdll.dll 
+            323 $7C90E485 - [7C900000] ntdll.dll 
+            324 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            325 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            326 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            327 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            328 $77DC7852 - [77DC0000] advapi32.dll 
+            329 $77DCEFF1 - [77DC0000] advapi32.dll 
+            32A $055F2D54 - [055F0000] TestPlugin2.dll 
+            32B $05606BC2 - [055F0000] TestPlugin2.dll 
+            32C $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            32D $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            32E $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            32F $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            330 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            331 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            332 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            333 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            334 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            335 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            336 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            337 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            338 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            339 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            33A $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            33B $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            33C $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            33D $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            33E $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            33F $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            340 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            341 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            342 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            343 $055F4183 - [055F0000] TestPlugin2.dll 
+            344 $7C9032A6 - [7C900000] ntdll.dll 
+            345 $7C903282 - [7C900000] ntdll.dll 
+            346 $7C903275 - [7C900000] ntdll.dll 
+            347 $7C903247 - [7C900000] ntdll.dll 
+            348 $7C92A8BE - [7C900000] ntdll.dll 
+            349 $7C90E906 - [7C900000] ntdll.dll 
+            34A $7C9705BF - [7C900000] ntdll.dll 
+            34B $7C9703BF - [7C900000] ntdll.dll 
+            34C $7C94BAF7 - [7C900000] ntdll.dll 
+            34D $7C90E906 - [7C900000] ntdll.dll 
+            34E $7C91A3C6 - [7C900000] ntdll.dll 
+            34F $7C92A824 - [7C900000] ntdll.dll 
+            350 $7C90E485 - [7C900000] ntdll.dll 
+            351 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            352 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            353 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            354 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            355 $77DC7852 - [77DC0000] advapi32.dll 
+            356 $77DCEFF1 - [77DC0000] advapi32.dll 
+            357 $055F2D54 - [055F0000] TestPlugin2.dll 
+            358 $05606BC2 - [055F0000] TestPlugin2.dll 
+            359 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            35A $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            35B $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            35C $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            35D $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            35E $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            35F $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            360 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            361 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            362 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            363 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            364 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            365 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            366 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            367 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            368 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            369 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            36A $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            36B $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            36C $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            36D $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            36E $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            36F $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            370 $055F4183 - [055F0000] TestPlugin2.dll 
+            371 $7C9032A6 - [7C900000] ntdll.dll 
+            372 $7C903282 - [7C900000] ntdll.dll 
+            373 $7C903275 - [7C900000] ntdll.dll 
+            374 $7C903247 - [7C900000] ntdll.dll 
+            375 $7C92A8BE - [7C900000] ntdll.dll 
+            376 $7C90E906 - [7C900000] ntdll.dll 
+            377 $7C9705BF - [7C900000] ntdll.dll 
+            378 $7C9703BF - [7C900000] ntdll.dll 
+            379 $7C94BAF7 - [7C900000] ntdll.dll 
+            37A $7C90E906 - [7C900000] ntdll.dll 
+            37B $7C91A3C6 - [7C900000] ntdll.dll 
+            37C $7C92A824 - [7C900000] ntdll.dll 
+            37D $7C90E485 - [7C900000] ntdll.dll 
+            37E $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            37F $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            380 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            381 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            382 $77DC7852 - [77DC0000] advapi32.dll 
+            383 $77DCEFF1 - [77DC0000] advapi32.dll 
+            384 $055F2D54 - [055F0000] TestPlugin2.dll 
+            385 $05606BC2 - [055F0000] TestPlugin2.dll 
+            386 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            387 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            388 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            389 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            38A $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            38B $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            38C $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            38D $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            38E $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            38F $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            390 $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            391 $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            392 $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            393 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            394 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            395 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            396 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            397 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            398 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            399 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            39A $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            39B $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            39C $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            39D $055F4183 - [055F0000] TestPlugin2.dll 
+            39E $7C9032A6 - [7C900000] ntdll.dll 
+            39F $7C903282 - [7C900000] ntdll.dll 
+            3A0 $7C903275 - [7C900000] ntdll.dll 
+            3A1 $7C903247 - [7C900000] ntdll.dll 
+            3A2 $7C92A8BE - [7C900000] ntdll.dll 
+            3A3 $7C90E906 - [7C900000] ntdll.dll 
+            3A4 $7C9705BF - [7C900000] ntdll.dll 
+            3A5 $7C9703BF - [7C900000] ntdll.dll 
+            3A6 $7C94BAF7 - [7C900000] ntdll.dll 
+            3A7 $7C90E906 - [7C900000] ntdll.dll 
+            3A8 $7C91A3C6 - [7C900000] ntdll.dll 
+            3A9 $7C92A824 - [7C900000] ntdll.dll 
+            3AA $7C90E485 - [7C900000] ntdll.dll 
+            3AB $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            3AC $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            3AD $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            3AE $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            3AF $77DC7852 - [77DC0000] advapi32.dll 
+            3B0 $77DCEFF1 - [77DC0000] advapi32.dll 
+            3B1 $055F2D54 - [055F0000] TestPlugin2.dll 
+            3B2 $05606BC2 - [055F0000] TestPlugin2.dll 
+            3B3 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            3B4 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            3B5 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            3B6 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            3B7 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            3B8 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            3B9 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            3BA $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            3BB $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            3BC $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            3BD $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            3BE $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            3BF $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            3C0 $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            3C1 $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            3C2 $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            3C3 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            3C4 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            3C5 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            3C6 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            3C7 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            3C8 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            3C9 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            3CA $055F4183 - [055F0000] TestPlugin2.dll 
+            3CB $7C9032A6 - [7C900000] ntdll.dll 
+            3CC $7C903282 - [7C900000] ntdll.dll 
+            3CD $7C903275 - [7C900000] ntdll.dll 
+            3CE $7C903247 - [7C900000] ntdll.dll 
+            3CF $7C92A8BE - [7C900000] ntdll.dll 
+            3D0 $7C90E906 - [7C900000] ntdll.dll 
+            3D1 $7C9705BF - [7C900000] ntdll.dll 
+            3D2 $7C9703BF - [7C900000] ntdll.dll 
+            3D3 $7C94BAF7 - [7C900000] ntdll.dll 
+            3D4 $7C90E906 - [7C900000] ntdll.dll 
+            3D5 $7C91A3C6 - [7C900000] ntdll.dll 
+            3D6 $7C92A824 - [7C900000] ntdll.dll 
+            3D7 $7C90E485 - [7C900000] ntdll.dll 
+            3D8 $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            3D9 $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            3DA $0560B220 - [055F0000] TestPlugin2.dll - ECore.pas -  - GetModifiedDate - 673[0]
+            3DB $0563E4E5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5884[9]
+            3DC $77DC7852 - [77DC0000] advapi32.dll 
+            3DD $77DCEFF1 - [77DC0000] advapi32.dll 
+            3DE $055F2D54 - [055F0000] TestPlugin2.dll 
+            3DF $05606BC2 - [055F0000] TestPlugin2.dll 
+            3E0 $0563D951 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5515[56]
+            3E1 $0563D750 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ExportedFunctions - 5459[0]
+            3E2 $0563E52E - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5892[17]
+            3E3 $0563E484 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddModule - 5875[0]
+            3E4 $056377C5 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2729[26]
+            3E5 $05637730 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByHandle - 2703[0]
+            3E6 $056377F3 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2738[1]
+            3E7 $056377E8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - ModuleInfoByAddr - 2737[0]
+            3E8 $0563B44D - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4455[2]
+            3E9 $0563B430 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetDebugInfosByAddr - 4453[0]
+            3EA $0563E658 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5960[5]
+            3EB $0563E604 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - AddToStack - 5955[0]
+            3EC $0563E917 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6055[5]
+            3ED $055F7D50 - [055F0000] TestPlugin2.dll - ELeaks.pas -  - SetOurPointer - 596[0]
+            3EE $055F7FCA - [055F0000] TestPlugin2.dll - ELeaks.pas -  - NewGetMem - 762[10]
+            3EF $0563E8EC - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - CallStackByAddresses - 6050[0]
+            3F0 $0563EC38 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6170[2]
+            3F1 $0563EBF8 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - GetCallStackByAddresses - 6168[0]
+            3F2 $05655A09 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14289[12]
+            3F3 $0565594C - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - EurekaLog_CallExceptObject - 14277[0]
+            3F4 $05655A9A - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            3F5 $05655A98 - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - Call_HookedExceptionObject - 14306[1]
+            3F6 $05655ABD - [055F0000] TestPlugin2.dll - ExceptionLog.pas -  - HookedExceptionObject - 14328[16]
+            3F7 $055F4183 - [055F0000] TestPlugin2.dll 
+            3F8 $7C9032A6 - [7C900000] ntdll.dll 
+            3F9 $7C903282 - [7C900000] ntdll.dll 
+            3FA $7C903275 - [7C900000] ntdll.dll 
+            3FB $7C903247 - [7C900000] ntdll.dll 
+            3FC $7C92A8BE - [7C900000] ntdll.dll 
+            3FD $7C90E906 - [7C900000] ntdll.dll 
+            3FE $7C9705BF - [7C900000] ntdll.dll 
+            3FF $7C9703BF - [7C900000] ntdll.dll 
+            400 $7C94BAF7 - [7C900000] ntdll.dll 

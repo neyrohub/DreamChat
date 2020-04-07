@@ -1,0 +1,573 @@
+//PluginManager for DreamChat kernel 0.5
+//site: http://sourceforge.net/projects/dreamchat
+//forum: http://dreamchat.flybb.ru/
+
+//Autor: Bajenov Andrey Bladimirovich (neyro@mail.ru)
+//Saint-Petersburg, Russia.
+//2007.02.03
+//All right reserved.
+
+//DreamChat PluginManager is published under a double license. You can choose
+//which one fits better for you, either Mozilla Public License (MPL) or Lesser
+//General Public License (LGPL). For more info about MPL read the MPL homepage.
+//For more info about LGPL read the LGPL homepage.
+
+//Работа этого менеджера сделана следующим образом:
+//+--------------------+   +----------------------+
+//| Native Plugin Type | ->| Extended Plugin Type |
+//+--------------------+   +----------------------+
+//|                    |   | GetPluginType        |
+//|  GetPluginInfo     |   | GetPluginInfo        |
+//+--------------------+   | + some function      |
+//                         +----------------------+
+
+//Поскольку все плагины должны иметь общие ф-ции
+//  TGetPluginType = function(var PluginTypeNote: PChar):byte;
+//  TGetPluginInfo = function():PPluginInfo;
+//то эти ф-ции вынесены в NATIVE (первичный) класс плагина TDChatPlugin, который
+//описан в модуле uDChatPlugin.
+//к классу TDChatPlugin может быть преобразован любой плагин, т.к. он реализует
+//только 2 основные информационные функции GetPluginType и GetPluginInfo. Эти
+//функции ОБЯЗАН иметь каждый плагин DreamChat!
+//Далее в зависимости от функционала, каждый ТИП плагина обрастает своими
+//специфическими функциями. Хочется подчеркнуть, именно ТИП плагина, а не
+//конкретный экземпляр! Может быть бесконечное количество экземпляров DLL, но
+//все они должны строго соответствовать одному из типов плагинов.
+//Тип плагина определяется набором функций которые он экспортирует. Например:
+
+//TDChatPlugin - самый первый тип (Native), реализован в классе TDChatPlugin
+//(uChatPlugin.pas).
+//Он не перечислен в TPluginType, т.к. является первичным. Экспортирует 2е
+//функции:
+//  TGetPluginType = function(var PluginTypeNote: PChar):byte;
+//    Возвращает номер типа плагина, перечисленного в множестве
+//    TPluginType = (Test, Visual, Communication, SoundEvents, Protocol);
+//  TGetPluginInfo = function():PPluginInfo;
+//    Возвращает указатель на структуру, содержащую информацию о плагине
+
+//TDChatTestPlugin - тестовый тип плагина, реализован в классе TDChatTestPlugin
+//(uDChatTestPlugin.pas)
+//Помимо 2х первичных ф-ций, он экспортирует еще 2е ф-ции:
+//  TTestFunction1 = function(i: integer):PChar;
+//    Просто тестовая ф-ция. Реализация в DLL обсолютно произвольная.
+//  TTestFunction2 = function(i: integer):PChar;
+//    Просто тестовая ф-ция. Реализация в DLL обсолютно произвольная.
+
+//TDChatCommPlugin - тип COMM, реализован в классе TDChatCommPlugin
+//(uDChatCommPlugin.pas)
+//Реализует все сетевые ф-ции! Соответственно DLL этого типа должна
+//экспортировать следующий набор ф-ций:
+//  SendCommDisconnect, SendCommConnect, SendCommText и т.д.
+
+//Можно добавлять свои типы плагинов! Для этого нужно:
+//1. Создать свой модуль, содержащий класс нового плагина (например на основе
+//   TDChatTestPlugin.
+//2. Добавить в КОНЕЦ множества TPluginType свой тип плагина.
+//3. Открыть модуть uPluginManager.pas и найти TPluginManager.LoadPlugin()
+//   Дописать в Case, что если указанный плагин имеет ваш тип, то
+//   он создается на основе вашего класса. Например:
+//   DChatPlugin := TDChatCommPlugin.Create(NativePlugin);
+//4. Открыть модуть uPluginManager.pas и найти TPluginManager.UnLoadPlugin()
+//   Дописать преобразование типа нативного плагина к вашему типу плагина.
+//   Иначе будет вызван деструктор нативного плагина, а ваш вызван не будет.
+
+//Как это работает?
+//Создаем объект PluginManager. Обращаемся к его св-ву PluginManager.FileList
+//При обращении в нем формируется список файлов DLL. Это могут быть как плагины,
+//так и левые DLL. После пробуем при помощи метода
+//PluginManager.LoadNativePlugin попытаеться обратиться к каждой DLL из списка
+//и экспортировать ф-ции GetPluginType и GetPluginInfo. Если это получается, то
+//основе этой DLL создается объект первичный плагин класса TDChatPlugin.
+//Все созданные первичные плагины храняться в списке NativePluginList.
+//Далее мы обращаемся к первичному плагину и при помощи PluginManager.LoadPlugin
+//пробуем его "проапгрейтить" до его типа.
+//Т.е. при вызове LoadPlugin мы передаем на входе первичный созданный плагин
+//на выходе (если не было ошибок) получаем список PluginManager.PluginList
+//созданных объектов-плагинов. Внутри LoadPlugin определяется тип плагина
+//убивается объект первичный плагин, соответствующей этой DLL и создается
+//объект продвинутого плагин уже одного из продвинутых типов TPluginType.
+//Т.е. происходит экспорт всех дополнительных ф-ций, реализованных в этом типе
+//плагина.
+//При выгрузке продвинутого плагина, он удаляется из списка PluginList его
+//объект уничтожается, DLL выгружается. И сразу же эта же DLL загружается
+//как нативный плагин и попадает в список нативных плагинов.
+//Надеюсь объяснил ))).
+
+unit Unit1;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
+  StdCtrls, DChatPluginManager, DChatPlugin, DChatTestPlugin, DChatCommPlugin,
+  DChatClientServerPlugin, CheckLst, IniFiles, VTHeaderPopup, Menus,
+  uMenuItemId;
+
+type
+  TFormManage = class(TForm)
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    ButtonLoadPlugin: TButton;
+    ButtonUnloadPlugin: TButton;
+    ListBox2: TListBox;
+    Memo1: TMemo;
+    Memo2: TMemo;
+    CheckListBox1: TCheckListBox;
+    ListBox1: TListBox;
+    VTHeaderPopupMenu1: TVTHeaderPopupMenu;
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure ButtonLoadPluginClick(Sender: TObject);
+    procedure ButtonUnloadPluginClick(Sender: TObject);
+    procedure ListBox2Click(Sender: TObject);
+    procedure CheckListBox1Click(Sender: TObject);
+    procedure CheckListBox1DblClick(Sender: TObject);
+    procedure CheckListBox1ClickCheck(Sender: TObject);
+    procedure RefreshCheckersOfAutoLoadPluginList(DoLoadPlugin: boolean);
+    procedure AddSendFileMenu(Component: TComponent; X, Y: Integer);
+    procedure CheckListBox1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure ListBox1MouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    PROCEDURE OnMenuClick(Sender: TObject);
+    function LoadingPlugin():boolean;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+var
+  ExePath: string;
+  FormManage: TFormManage;
+  PluginManager: TPluginManager;
+  PluginManagerConfig: TMemIniFile;
+
+implementation
+
+{$R *.DFM}
+
+procedure TFormManage.FormCreate(Sender: TObject);
+var i: integer;
+    maxWidth: integer;
+begin
+ExePath := ExtractFilePath(Application.ExeName);
+PluginManagerConfig := TMemIniFile.Create(ExePath + 'Config.ini');
+
+PluginManager := TPluginManager.Create(ExePath + 'plugins\');
+Memo1.Lines.Clear;
+Memo2.Lines.Clear;
+ListBox1.Items := PluginManager.FileList;
+
+//создаем горизонтальную полосу прокрутки в ListBox1
+    maxWidth := 0;
+      for i := 0 to ListBox1.Items.Count - 1 do
+        begin
+        if maxWidth < ListBox1.Canvas.TextWidth(ListBox1.Items.Strings[i]) then
+          maxWidth := ListBox1.Canvas.TextWidth(ListBox1.Items.Strings[i]);
+        end;
+      ListBox1.Perform(LB_SETHORIZONTALEXTENT, maxWidth + 10, 0);
+
+for i := 0 to PluginManager.FileList.Count - 1 do
+  begin
+  if PluginManager.LoadNativePlugin(PluginManager.FileList.Strings[i]) = false then
+    begin
+    ChecklistBox1.Items.Add('Load Plugin error!');
+    end;
+  end;
+ChecklistBox1.Items := PluginManager.NativePluginList;
+
+RefreshCheckersOfAutoLoadPluginList(true);
+end;
+
+procedure TFormManage.FormDestroy(Sender: TObject);
+var i: integer;
+    NativePlugin: TDChatPlugin;
+begin
+if ChecklistBox1.Items.Count > 0 then
+  begin
+  for i := 0 to ChecklistBox1.Items.Count - 1 do
+    begin
+    //записываем статус галочек
+    NativePlugin := TDChatPlugin(CheckListBox1.Items.Objects[i]);
+    PluginManagerConfig.WriteBool('PluginAutoLoad', NativePlugin.Filename, CheckListBox1.Checked[i]);
+    end;
+  PluginManagerConfig.UpdateFile;
+  end;
+VTHeaderPopupMenu1.Items.Clear;
+PluginManager.Free;
+PluginManagerConfig.Free;
+end;
+
+procedure TFormManage.RefreshCheckersOfAutoLoadPluginList(DoLoadPlugin: boolean);
+var i: integer;
+    NativePlugin: TDChatPlugin;
+    res: boolean;
+begin
+//смотрим какой плагин надо выделить галочкой для автозагрузки
+i := 0;
+while i <= ChecklistBox1.Items.Count - 1 do
+  begin
+  NativePlugin := TDChatPlugin(CheckListBox1.Items.Objects[i]);
+  //нашли, что в конфиге упоминается SomeFile.dll = 1 или 0
+  CheckListBox1.Checked[i] := PluginManagerConfig.ReadBool('PluginAutoLoad', NativePlugin.Filename, false);
+  if CheckListBox1.Checked[i] = true then
+    begin
+    if DoLoadPlugin = true then
+      begin
+      CheckListBox1.ItemIndex := i;
+      res := LoadingPlugin;
+      if res = false then
+        begin
+        //вызов загрузки плагина привел к ошибке!
+        //переходим к следующему плагину в списке отмеченых
+        inc(i);
+        end;
+      //помним, что при нажатии строка покидает список! не увеличиваем i!
+      end
+    else
+      begin
+      //DoLoadPlugin = false
+      //вызывается для обновления галочек у списка плагинов
+      //без их перезагрузки.
+      inc(i);
+      end;
+    end
+  else
+    begin
+    //данный плагин не отмечен галочкой для загрузки
+    //переходим к следующему в списке
+    inc(i);
+    end;
+  end;
+end;
+
+procedure TFormManage.ButtonLoadPluginClick(Sender: TObject);
+var TestPlugin: TDChatTestPlugin;
+    Version: integer;
+    e: EPluginError;
+begin
+LoadingPlugin;
+end;
+
+function TFormManage.LoadingPlugin():boolean;
+var DChatPlugin: TDChatPlugin;
+    Version: integer;
+    e: EPluginLoadingError;
+begin
+result := true;
+if ChecklistBox1.ItemIndex >= 0 then
+  begin
+    try
+      Version := strtoint(TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]).PluginInfo.PluginManagerAPIVersion);
+      DChatPlugin := TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]);
+      if (DChatPlugin.PluginInfo.PluginAPIVersion <> '') or
+        (Version = PlaginManagerVersion) then
+        begin
+          try
+            //загружаем плагин
+            if PluginManager.LoadPlugin(DChatPlugin) = false then
+              begin
+              //ошибка загрузки
+              e := EPluginLoadingError.Create('Ошибка загрузки библиотеки (плагина) ' +
+                                       PChar(string(DChatPlugin.Filename))
+                                       );
+              result := false;
+              raise e;
+              end;
+          except
+            messagebox(0, PChar(string(TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]).Filename)),
+                  PChar('Ошибка загрузки библиотеки (плагина)'), mb_ok);
+            result := false;
+            exit;
+          end;
+        CheckListBox1.Items := PluginManager.NativePluginList;
+        listBox2.Items := PluginManager.PluginList;
+        RefreshCheckersOfAutoLoadPluginList(false);
+        end
+      else
+        begin
+        messagebox(0,
+               PChar('Плагин имеет не совместивую версию API интерфейса! PluginManagerAPIVersion = ' +
+               TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]).PluginInfo.PluginManagerAPIVersion +
+               ' . Должна быть = ' + IntToStr(PlaginManagerVersion)),
+               PChar(string(TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]).Filename)),
+               mb_ok);
+        result := false;
+        end;
+    except
+      messagebox(0,
+               PChar('Плагин имеет не совместивую версию API интерфейса! PluginManagerAPIVersion = ' +
+               TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]).PluginInfo.PluginManagerAPIVersion +
+               ' . Должна быть = ' + IntToStr(PlaginManagerVersion)),
+               PChar(string(TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]).Filename)),
+               mb_ok);
+    result := false;
+    end;
+  end;
+memo2.Lines.Clear;
+end;
+
+procedure TFormManage.CheckListBox1DblClick(Sender: TObject);
+begin
+ButtonLoadPluginClick(Sender);
+end;
+
+
+procedure TFormManage.ButtonUnloadPluginClick(Sender: TObject);
+var NativePlugin: TDChatPlugin;
+begin
+//выгружаем продвинутый плагин и загружаем его в список Native
+if listBox2.ItemIndex >= 0 then
+  begin
+  PluginManager.UnLoadPlugin(listBox2.Items.Objects[listBox2.ItemIndex]);
+  CheckListBox1.Items.assign(PluginManager.NativePluginList);
+  listBox2.Items := PluginManager.PluginList;
+  RefreshCheckersOfAutoLoadPluginList(false);
+  end;
+end;
+
+procedure TFormManage.CheckListBox1Click(Sender: TObject);
+var NativePlugin: TDChatPlugin;
+    s: string;
+begin
+if CheckListBox1.ItemIndex >= 0 then
+  begin
+  NativePlugin := TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]);
+  memo1.Lines.Clear;
+  memo1.Lines.Add('PluginName: ' + NativePlugin.PluginInfo.PluginName);
+  memo1.Lines.Add('InternalPluginFileName: ' + NativePlugin.PluginInfo.InternalPluginFileName);
+  case ord(NativePlugin.PluginInfo.PluginType) of
+    0: s := 'Test';
+    1: s := 'Visual';
+    2: s := 'Communication';
+    3: s := 'SoundEvents';
+    4: s := 'Protocol';
+    5: s := 'ClientServer';
+  else
+    begin
+    s := 'Unknown';
+    end;
+  end;  
+  memo1.Lines.Add('PluginType: ' + s);
+  if Length(NativePlugin.PluginInfo.PluginManagerAPIVersion) > 0 then
+    memo1.Lines.Add('PluginManager (Native API Version): ' + NativePlugin.PluginInfo.PluginManagerAPIVersion)
+  else
+    memo1.Lines.Add('PluginManager (Native API Version): Unknown');
+  if Length(NativePlugin.PluginInfo.PluginAPIVersion) > 0 then
+    memo1.Lines.Add('PluginAPIVersion: ' + NativePlugin.PluginInfo.PluginAPIVersion)
+  else
+    memo1.Lines.Add('PluginAPIVersion: Unknown');
+  if Length(NativePlugin.PluginInfo.PluginVersion) > 0 then
+    memo1.Lines.Add('PluginVersion: ' + NativePlugin.PluginInfo.PluginVersion)
+  else
+    memo1.Lines.Add('PluginVersion: Unknown');
+  memo1.Lines.Add('PluginAutorName: ' + NativePlugin.PluginInfo.PluginAutorName);
+  memo1.Lines.Add('PluginComment: ' + NativePlugin.PluginInfo.PluginComment);
+  end;
+end;
+
+procedure TFormManage.ListBox2Click(Sender: TObject);
+var TestPlugin: TDChatTestPlugin;
+    CommPlugin: TDChatCommPlugin;
+    NativePlugin: TDChatPlugin;
+    ClientServerPlugin: TDChatClientServerPlugin;
+    s: string;
+begin
+//попытаем вызвать функции загруженных плагинов!
+
+if listBox2.ItemIndex >= 0 then
+  begin
+  if listBox2.Items.Objects[listBox2.ItemIndex] is TDChatClientServerPlugin then
+    begin
+    //если выделен плагин типа TDChatTestPlugin, то у него есть
+    //функция TestFunction1, TestFunction2
+    ClientServerPlugin := TDChatClientServerPlugin(listBox2.Items.Objects[listBox2.ItemIndex]);
+    if ClientServerPlugin <> nil then
+      begin
+      s := ClientServerPlugin.ExecuteCommand('showform', '', 0);
+      memo2.Lines.Add(s);
+      end;
+    end;
+  if listBox2.Items.Objects[listBox2.ItemIndex] is TDChatTestPlugin then
+    begin
+    //если выделен плагин типа TDChatTestPlugin, то у него есть
+    //функция TestFunction1, TestFunction2
+{    TestPlugin := TDChatTestPlugin(listBox2.Items.Objects[listBox2.ItemIndex]);
+    if TestPlugin <> nil then
+      begin
+      s := TestPlugin.TestFunction1(0);
+      memo2.Lines.Add(s);
+      end;}
+    end;
+  if listBox2.Items.Objects[listBox2.ItemIndex] is TDChatCommPlugin then
+    begin
+    //если выделен плагин типа TDChatCommPlugin, то у него есть все
+    //функции посылки сообщений
+    CommPlugin := TDChatCommPlugin(listBox2.Items.Objects[listBox2.ItemIndex]);
+    s := CommPlugin.SendCommText('iChat', '192.168.1.4/ANDREY/Admins', 'Andrey',
+                                 'Message from plugin', 'gsMTCI', 1);
+    //если все поля заполнены правильно, то в DChat в DebugLog отобразиться
+    //'Message from plugin' сообщение.
+    //Чтобы сообщение пришло в сам чат, нужно запустить PluginManager от
+    //имени другого пользователя (Run As) иначе чат считает что это его сообщения
+    if s = '' then s := 'SendCommText() executed!';
+    memo2.Lines.Add(s);
+    end;
+
+  NativePlugin := TDChatPlugin(listBox2.Items.Objects[listBox2.ItemIndex]);
+  if NativePlugin <> nil then
+    begin
+    memo1.Lines.Clear;
+    memo1.Lines.Add('PluginName: ' + NativePlugin.PluginInfo.PluginName);
+    memo1.Lines.Add('InternalPluginFileName: ' + NativePlugin.PluginInfo.InternalPluginFileName);
+    memo1.Lines.Add('PluginAutorName: ' + NativePlugin.PluginInfo.PluginAutorName);
+    memo1.Lines.Add('PluginComment: ' + NativePlugin.PluginInfo.PluginComment);
+    end;
+  end;
+end;
+
+procedure TFormManage.CheckListBox1ClickCheck(Sender: TObject);
+begin
+  //записываем статус галочек
+  PluginManagerConfig.WriteBool('PluginAutoLoad', TDChatPlugin(CheckListBox1.Items.Objects[CheckListBox1.ItemIndex]).Filename, CheckListBox1.Checked[CheckListBox1.itemindex]);
+  PluginManagerConfig.UpdateFile;
+end;
+
+procedure TFormManage.AddSendFileMenu(Component: TComponent; X, Y: Integer);
+var MenuItemId: TMenuItemId;
+    ClientServerPlugin: TDChatClientServerPlugin;
+    i, MenuNumb: integer;
+    MenuCaption: string;
+//    NativePlugin: TDChatPlugin;
+begin
+//создаем меню, появляющегося при нажатии на юзера в дереве
+//VTHeaderPopupMenu1.AddUserMenu(Component, X, Y, PDNode, VirtualNode);
+VTHeaderPopupMenu1.Items.Clear;
+
+{
+for i := 0 to listBox1.Items.Count - 1 do
+  begin
+    NativePlugin := TDChatPlugin(CheckListBox1.Items.Objects[i]);
+    memo2.Lines.Add('PluginName: ' + NativePlugin.PluginInfo.PluginName);
+    if NativePlugin <> nil then
+      begin
+      if ord(NativePlugin.PluginInfo.PluginType) = 5 then ;//'ClientServer';
+        begin
+        MenuItem := TMenuItem.Create(VTHeaderPopupMenu1);
+        MenuItem.Tag := i;
+        MenuItem.OnClick := OnMenuClick;
+        //MenuItem.Caption := 'Это меню для';
+        MenuItem.Caption := ClientServerPlugin.GetMenuItem;
+        VTHeaderPopupMenu1.Items.Add(MenuItem);
+        end;
+      end;
+  end;
+}
+
+//тут сделать цикл перечисления всех загруженых плагинов марки Клиент-Сервер
+//и попытаться у них вызвать функцию получения надписи строки меню.
+for i := 0 to listBox2.Items.Count - 1 do
+  begin
+  if listBox2.Items.Objects[i] <> nil then
+    begin
+    if listBox2.Items.Objects[i] is TDChatClientServerPlugin then
+      begin
+      //если выделен плагин типа TDChatTestPlugin, то у него есть
+      //функция TestFunction1, TestFunction2
+      ClientServerPlugin := TDChatClientServerPlugin(listBox2.Items.Objects[i]);
+      MenuNumb := 0;
+      MenuCaption := ClientServerPlugin.ExecuteCommand('GetMenuItem', Pchar(inttostr(MenuNumb)), 0);
+      while length(MenuCaption) > 0 do
+        begin
+        MenuItemId := TMenuItemId.Create(VTHeaderPopupMenu1);
+        MenuItemId.Tag := i;
+        MenuItemId.Id := MenuNumb;//0;
+        MenuItemId.DChatClientServerPlugin := ClientServerPlugin;
+        MenuItemId.OnClick := OnMenuClick;
+        //MenuItem.Caption := 'Это меню для';
+        MenuItemId.Caption := MenuCaption;
+        VTHeaderPopupMenu1.Items.Add(MenuItemId);
+        inc(MenuNumb);
+        MenuCaption := ClientServerPlugin.ExecuteCommand('GetMenuItem', Pchar(inttostr(MenuNumb)), 0);
+        end;
+      end;
+    end;
+  end;
+
+end;
+
+procedure TFormManage.CheckListBox1MouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+AddSendFileMenu(CheckListBox1, x, y);
+end;
+
+procedure TFormManage.ListBox1MouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+AddSendFileMenu(ListBox1, x, y);
+end;
+
+PROCEDURE TFormManage.OnMenuClick(Sender: TObject);
+var i, n: integer;
+    ClientServerPlugin: TDChatClientServerPlugin;
+    InitString: string;
+begin
+i := TMenuItemId(Sender).Tag;
+//блин! этот i зависит от того в какой строке плагин выведен в списке плагинов!!!!
+if TMenuItemId(Sender).DChatClientServerPlugin <> nil then
+  begin
+  if TMenuItemId(Sender).DChatClientServerPlugin is TDChatClientServerPlugin then
+    begin
+    ClientServerPlugin := TMenuItemId(Sender).DChatClientServerPlugin;
+    if ClientServerPlugin.PluginInfo.PluginName = 'File client' then
+      begin
+      //если выделен плагин типа TDChatTestPlugin, то у него есть
+      //функция TestFunction1, TestFunction2
+      n := TMenuItemId(Sender).Id;//{ - Trunc(TMenuItem(Sender).Tag/100)*100};
+        case n of
+        0:
+          begin
+          ClientServerPlugin := TDChatClientServerPlugin(listBox2.Items.Objects[i]);
+          if ClientServerPlugin <> nil then
+            begin
+            ClientServerPlugin.ExecuteCommand('ShowForm', '', 0);
+            Memo2.Lines.Add('ExecuteCommand ShowForm');
+            end;
+          end;
+        1:
+          begin
+          ClientServerPlugin := TDChatClientServerPlugin(listBox2.Items.Objects[i]);
+          if ClientServerPlugin <> nil then
+            begin
+            Randomize;
+            InitString := '[Client]' + #13 +
+                            'ServerIP=127.0.0.1'+ #13 +
+//                          'ServerPort=5557'+ #13 +
+                            'ServerPort=' + inttostr(random(10000)) + #13 +
+                            'NickName=' + 'NickName' + #13 +
+                            'RemoteNickName=' + 'RemoteNickName' + #13 +
+                            'AutoConnect=true';
+            Memo2.Lines.Add('Executing command: Connect');
+            Memo2.Lines.Add('Result: ' + ClientServerPlugin.ExecuteCommand('Connect', PChar(InitString), 0));
+            end;
+          end;
+        end;
+      end;
+    if ClientServerPlugin.PluginInfo.PluginName = 'File server' then
+      begin
+      //если выделен плагин типа TDChatTestPlugin, то у него есть
+      //функция TestFunction1, TestFunction2
+      if ClientServerPlugin <> nil then
+        begin
+        ClientServerPlugin.ExecuteCommand('ShowForm', '', 0);
+        Memo2.Lines.Add('ExecuteCommand ShowForm');
+        end;
+      Memo2.Lines.Add('MenuItem2');
+      end;
+    end;
+  end;
+end;
+
+end.
